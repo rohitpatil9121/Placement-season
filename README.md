@@ -86,9 +86,21 @@ npm run build
 npm run preview
 ```
 
+## Look and feel
+
+- **A colour per stat.** Energy amber, Sleep indigo, DSA violet, CGPA green, Wellbeing coral, career stats teal, offers gold. The same hue follows a stat through its bar, its effect chip, its floating delta, the day summary and the result poster.
+- **The world changes with the season.** The page tint shifts from mint (Preparation) to amber (Grind), blue (Interviews), coral (Final Week) and gold (Placement Day). Optional dark mode keeps the hues on deep navy.
+- **A mascot.** A simple SVG student in the day hero (and beside the mobile state strip) whose face tracks energy and wellbeing: fresh, tired, dead-inside, hyped, celebrating. A second character, the interviewer, reacts to each answer.
+- **Juice.** Coloured pills pop out of every action, bars spring and flash, negative changes give a two-pixel shake, action dots are gold coins that flip when spent, streaks earn a flame chip and a tiny bonus, good days end in confetti sized to how good they were, legendary events flash and sparkle, offers rain gold, achievements arrive as a shimmering medal and pulse the trophy button until opened.
+- **Interactive surfaces.** Hovering an action ghost-fills the state bars with its exact effect. The timeline is a journey path with milestone icons and the mascot's head as the marker. Companies are trading cards with initials marks and tier colour bands that flip on stage change.
+- **Placement Day.** Each revealed number lands with a coloured burst and a rising tone, the verdict fills the screen in the outcome colour with the mascot, and the 9:16 poster card carries stat bars in stat colours.
+- **Sound, off by default.** Coin ticks for actions, a three-note sting for offers, a low thud for rejections, a short arpeggio for phase changes, a proper motif for placement. Mute lives in the header.
+
+Everything above respects reduced motion: no particles, no shakes, no flashes, and instant sheet transitions.
+
 ## Design philosophy
 
-- **Less UI, more meaning.** No card around everything, no rainbow bars, no gradients for their own sake. A warm off-white page, one serif for moments that matter, one sans for everything else, a single lime accent used as a signature.
+- **Less UI, more meaning.** Colour carries information, never decoration: every hue on screen belongs to a stat, a phase, a tier or an outcome. A warm off-white page, one serif for moments that matter, one sans for everything else.
 - **The game feels physical.** Rows move a few pixels on hover, presses compress, numbers interpolate, days transition with a pause. Motion explains cause and effect.
 - **Humor lives in the content.** The interface stays quiet so the writing can be funny. Emoji stay out of the chrome.
 - **The important things are obvious.** What day is it, how long is left, how am I doing, what can I do, what will it cost. Everything else is secondary or hidden until it is relevant.
