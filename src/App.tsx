@@ -12,6 +12,7 @@ import { useGame } from './hooks/useGame'
 import { useSound } from './hooks/useSound'
 import { useMusic } from './hooks/useMusic'
 import { getPhase } from './game/balance'
+import { loadLiveCompanies, type LiveInfo } from './game/liveData'
 
 export default function App() {
   const [soundOn, setSoundOn] = useState(true)
@@ -25,6 +26,8 @@ export default function App() {
 
   useEffect(() => setSoundOn(settings.sound), [settings.sound])
   useMusic(settings.music, state && view === 'game' ? getPhase(state.day).id : view === 'result' ? 'day90' : 'prep')
+  const [live, setLive] = useState<LiveInfo>({ updatedAt: null, source: 'bundled' })
+  useEffect(() => { void loadLiveCompanies().then(setLive) }, [])
 
   // first-day hint is shown once, then remembered
   useEffect(() => {
@@ -61,6 +64,7 @@ export default function App() {
             onIgnore={g.ignore}
             onSettings={openSettings}
             onHome={g.home}
+            live={live}
           />
           <EventSheet state={state} onResolve={g.resolveEvent} />
           <InterviewSheet state={state} onAnswer={g.answer} onClose={g.endInterview} />

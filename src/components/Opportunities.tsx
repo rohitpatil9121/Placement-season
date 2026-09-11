@@ -31,11 +31,12 @@ function Pipeline({ stage, color }: { stage: ApplicationStage; color: string }) 
   )
 }
 
-export function Opportunities({ state, onApply, onIgnore }: { state: GameState; onApply: (id: string) => void; onIgnore: (id: string) => void }) {
+export function Opportunities({ state, onApply, onIgnore, live }: { state: GameState; onApply: (id: string) => void; onIgnore: (id: string) => void; live?: { updatedAt: string | null; source: string } }) {
   const apps = [...state.applications].filter((a) => a.stage !== 'rejected' || a.updatedDay >= state.day - 3).reverse()
   const known = new Set(state.applications.map((a) => a.companyId))
   const upcoming = COMPANIES.filter((c) => !known.has(c.id) && c.appearsTo >= state.day).sort((a, b) => a.appearsFrom - b.appearsFrom).slice(0, 5)
-  const disclaimer = <p className="mt-4 text-[11px] text-faint leading-relaxed">Real employers. Packages are approximate base pay from publicly reported fresher offers and change every year; roles and dates are simplified.</p>
+  const stamp = live?.updatedAt ? `Data updated ${live.updatedAt}${live.source === 'remote' ? ' · live from GitHub' : ''}.` : 'Bundled data.'
+  const disclaimer = <p className="mt-4 text-[11px] text-faint leading-relaxed">{stamp} Real employers; packages are approximate base pay from publicly reported fresher offers and change every year. Roles and dates are simplified.</p>
   if (!apps.length) {
     return (
       <section aria-label="Companies" className="panel p-5">

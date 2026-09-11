@@ -29,6 +29,7 @@ type Props = {
   onIgnore: (id: string) => void
   onSettings: () => void
   onHome: () => void
+  live?: { updatedAt: string | null; source: string }
 }
 
 function SavedLabel({ at }: { at: number | null }) {
@@ -124,7 +125,7 @@ export function GameScreen(p: Props) {
 
         <aside className="space-y-5 lg:pt-3">
           <StatePanel state={state} deltas={p.deltas} peek={peek} />
-          <Opportunities state={state} onApply={p.onApply} onIgnore={p.onIgnore} />
+          <Opportunities state={state} onApply={p.onApply} onIgnore={p.onIgnore} live={p.live} />
           <Recent log={state.log} day={state.day} />
         </aside>
       </main>
