@@ -1,3 +1,4 @@
+import { MotionConfig } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { DayTransition } from './components/DayTransition'
 import { EventSheet } from './components/EventSheet'
@@ -27,7 +28,7 @@ export default function App() {
   const inRun = !!state && state.status !== 'finished'
 
   return (
-    <>
+    <MotionConfig reducedMotion={settings.reducedMotion ? 'always' : 'user'}>
       {view === 'start' && (
         <StartScreen saved={state} best={g.best} corrupted={g.corrupted} onStart={g.startNew} onContinue={g.continueGame} onSettings={() => setSettingsOpen(true)} />
       )}
@@ -71,6 +72,6 @@ export default function App() {
         onNewGame={g.startNew}
         onResetAll={g.resetAll}
       />
-    </>
+    </MotionConfig>
   )
 }

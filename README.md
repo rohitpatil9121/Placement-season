@@ -1,164 +1,102 @@
-# 🎓 Placement Season
+# Placement Season
 
-> 90 days. 3 actions a day. One placement. **Can you survive final year?**
+A small, premium browser game about the last 90 days before campus placements at an Indian college. One decision at a time. How badly can this go?
 
-Placement Season is a humorous, fully playable browser game about the final-year placement grind at an Indian college. It blends a student-life simulator, a resource-management game, and a meme generator. You have 90 days before placement day to balance six stats, survive random events (surprise vivas, LinkedIn, Sharma ji ka beta), and land the best offer you can.
+Ninety days, three actions a day, six things to balance, a company pipeline with real eligibility gates, short interactive interviews, and a placement-day reveal you will want to screenshot.
 
-Results may be emotionally accurate.
+## Features
 
----
+- **A real 90-day loop.** Three actions a day, an end-of-day transition that shows exactly what changed, and a morning that may bring an event, a company, or an interview.
+- **Five core stats, progressively revealed career stats.** Energy, Sleep, DSA, CGPA and Wellbeing from Day 1. Projects, Resume, Interview, Networking and Applications appear only once you start working on them.
+- **Honest consequences.** Every action shows its effect before you commit. Diminishing returns make each skill harder to push the higher it gets, and neglected skills fade.
+- **Forty-plus events** with dry, observational writing. Some are interruptions, some are decisions with real tradeoffs. Rarity changes how an event feels, not a label on the screen.
+- **Companies with personalities.** Eight fictional employers with eligibility thresholds (CGPA, DSA, Projects, Resume), a discovered → applied → assessment → shortlisted → interview → result pipeline, and a short three-question interview that actually matters.
+- **A controlled random engine.** Strong networking raises referral odds, low wellbeing invites worse days, and an anti-frustration rule keeps a good run from being wrecked by luck while tossing struggling players an opportunity.
+- **Placement Day.** A nearly empty screen, a staged reveal of your numbers, then the verdict and a poster-style result card built for an Instagram story screenshot.
+- **Share.** Web Share on mobile, clipboard everywhere else. "Copied. Go humblebrag."
+- **Twenty achievements**, local best-run records, auto-save after every change, a corrupted-save recovery path, keyboard shortcuts, reduced motion, and an optional muted-by-default sound layer.
 
-## ✨ Features
+## Gameplay
 
-- **Full 90-day loop** — 3 action points per day, 13 distinct actions, end-of-day recovery, 5 story arcs with escalating intensity.
-- **Six visible stats** (Energy, DSA, Sleep, CGPA, Wellbeing, Career) plus 8 hidden progress stats (Projects, Resume, Interview, Applications, Networking, Luck, Motivation, Attendance).
-- **40+ random events** across five rarity tiers (Common → Legendary), including multi-choice dilemmas with real tradeoffs.
-- **Diminishing returns & decay** — skills get harder to raise as they grow, and neglected skills fade. No single perfect strategy.
-- **20 achievements** with unlock toasts, confetti and a persistent trophy cabinet.
-- **Placement Day** — dramatic reveal, 7 distinct endings, salary in LPA, a fictional company name, radar chart, and a humorous season summary.
-- **Share your result** via the Web Share API (clipboard fallback).
-- **Local leaderboard** of your best runs.
-- **Auto-save** to LocalStorage after every action, with validated loading and a safe reset if the save is corrupted.
-- **Seeded RNG** so every run is reproducible from its seed.
-- **Polished UI** — glassmorphism dashboard, animated stat bars, floating stat deltas, screen shake on bad events, legendary glow, phase-based theme shifts.
-- **Responsive** — desktop dashboard layout; stacked cards, collapsible log and a bottom action bar on mobile.
-- **Accessible** — keyboard shortcuts (`1`–`9` for actions, `E` to end day), visible focus rings, ARIA labels, focus-trapped dialogs, reduced-motion mode.
-- **Optional sound** — tiny WebAudio synth blips, muted by a single click, never autoplayed.
+1. Start. You are on Day 1 with a 7.8 CGPA and unearned confidence.
+2. Each day, spend three actions: practice DSA, study, build a project, sleep, mock interview, fix your resume, network, go out, attend class, apply off-campus. Coffee is free but borrows from tonight. Writing off a day costs all three.
+3. Events interrupt. Some just happen; some ask what you do.
+4. From Day 20, companies start visiting campus. Apply if you clear the bar. Clear the assessment, sit the interview, get the offer or don't.
+5. End the day. See what changed. Start the next one.
+6. On Day 90, the season is scored and the verdict is revealed.
 
-## 🛠 Tech Stack
+Keyboard: `1`–`9` triggers the actions in order, `E` ends the day, `Enter` starts the next day, `Esc` closes sheets.
 
-- React 19 + TypeScript
-- Vite
-- Tailwind CSS v4
-- Framer Motion
-- Lucide React
-- LocalStorage (no backend)
+## Game mechanics
 
-## 🚀 How to Run
+| Stat | Behaviour |
+|------|-----------|
+| Energy | Spent by work, restored overnight in proportion to Sleep. At zero, demanding actions lock. |
+| Sleep | Decays every night. Restored by sleeping, drained by coffee, parties and all-nighters. |
+| DSA | Improves slowly with practice. Gains shrink above 30/50/70/85. Fades a little on days you skip. |
+| CGPA | Shown as 5.0–10.0, stored 0–100. Moves slowly. Drifts down if academics are ignored for long. |
+| Wellbeing | Moves fast. Below 30, worse events and weaker productivity. Above 85, small bonuses. |
+| Career stats | Projects, Resume, Interview, Networking, Applications, plus hidden Luck and Motivation. |
+
+**Companies.** Each has a role, package, tagline, eligibility, and an assessment type (DSA, projects or aptitude). Assessment pass chance is driven by the matching stats and luck; interview success is the sum of your three answers plus Interview skill, judged against the company's tier.
+
+**Scoring.** A hidden weighted blend of DSA, CGPA, Projects, Interview, Resume, Networking, Applications and Luck, nudged by Wellbeing and any offers held. An on-campus offer guarantees placement at that package; otherwise the score maps to one of seven outcomes from "Not placed" to "Campus legend" with a fictional off-campus employer.
+
+**Balance.** `npx tsx scripts/sim.ts` plays 40 seeded runs per strategy. A perfectly balanced bot scores about 88, chaotic random play about 77, single-focus specialists in the low 50s, and sleeping all season about 34. Every style finishes; none dominates.
+
+## Tech stack
+
+React 19 · TypeScript · Vite · Tailwind CSS v4 · Framer Motion · Lucide React · LocalStorage. No backend, no analytics, nothing fake.
+
+## Architecture
+
+```
+src/
+  game/            pure, data-driven engine (no React)
+    actions.ts     action definitions, previews, microcopy
+    events.ts      event pool, conditions, choices
+    companies.ts   companies, eligibility, interview questions
+    achievements.ts
+    balance.ts     constants, phases, tiers, overnight recovery, pass chances
+    scoring.ts     career score, placement score, outcomes, salary
+    engine.ts      createGame · performAction · applyEvent · applyToCompany ·
+                   answerInterview · endDay · startDay · unlockAchievements
+  hooks/
+    useGame.ts     React glue: state, persistence, notices, best runs
+    useSound.ts    WebAudio synth (no assets)
+  components/      screens and sheets; no game maths inside JSX
+  utils/           seeded RNG, validated storage, share
+  types/game.ts    all shared types
+scripts/sim.ts     headless balance simulation
+```
+
+Every state transition is a pure function on `GameState`. Randomness comes from a seeded PRNG whose state is saved, so a run is reproducible from its seed.
+
+## Installation
 
 ```bash
 npm install
 npm run dev
 ```
 
-Open the URL Vite prints (usually `http://localhost:5173`).
-
-Other scripts:
+## Build
 
 ```bash
-npm run build      # type-check + production build into dist/
-npm run preview    # serve the production build
-npx tsx scripts/sim.ts   # headless balance simulation across strategies
+npm run build
+npm run preview
 ```
 
-## 🎮 Game Mechanics
+## Design philosophy
 
-### Daily loop
+- **Less UI, more meaning.** No card around everything, no rainbow bars, no gradients for their own sake. A warm off-white page, one serif for moments that matter, one sans for everything else, a single lime accent used as a signature.
+- **The game feels physical.** Rows move a few pixels on hover, presses compress, numbers interpolate, days transition with a pause. Motion explains cause and effect.
+- **Humor lives in the content.** The interface stays quiet so the writing can be funny. Emoji stay out of the chrome.
+- **The important things are obvious.** What day is it, how long is left, how am I doing, what can I do, what will it cost. Everything else is secondary or hidden until it is relevant.
+- **Nobody fights the interface.** One start button, a one-line first-day hint instead of a tutorial, consequence previews on every choice, no confirmation dialogs except for deleting progress.
 
-```
-Start day → see stats → spend 3 action points → events may interrupt
-→ End day → overnight recovery (driven by Sleep) → next day → … → Day 90 → Placement Day
-```
+## Future improvements
 
-### Stats
-
-| Stat | Range | Start | Notes |
-|------|-------|-------|-------|
-| ⚡ Energy | 0–100 | 80 | At 0, demanding actions are locked and bad events get likelier. |
-| 🧠 DSA | 0–100 | 30 | Diminishing returns above 30/50/70/85. Fades slightly on days you skip practice. |
-| 😴 Sleep | 0–100 | 65 | Drives overnight energy recovery and learning efficiency. Decays every night. |
-| 📚 CGPA | 5.0–10.0 | 7.8 | Stored internally as 0–100 (`100 = 10.0`). Drifts down if academics are ignored. |
-| ❤️ Wellbeing | 0–100 | 70 | Low wellbeing boosts breakdown & LinkedIn events and hurts productivity. |
-| 💼 Career | 0–100 | computed | Hidden weighted blend of DSA, projects, resume, interview, networking, applications and CGPA. |
-
-### Actions
-
-| Action | Cost | Main effects |
-|--------|------|--------------|
-| 🧠 Grind DSA | 1 | DSA +4…8 (scaled by sleep, energy, mood), Energy −12, Wellbeing −3 |
-| 😴 Deep Sleep | 1 | Sleep +20, Energy +15, Wellbeing +8 |
-| 📚 Study Academics | 1 | CGPA +0.05…0.12, Energy −10, Wellbeing −3 |
-| 💻 Build Project | 1 | Projects +5, Career +2, Energy −12 |
-| 🎤 Mock Interview | 1 | Interview +5, Energy −10, Wellbeing −4; 25% chance of getting destroyed |
-| 📨 Apply for Jobs | 1 | Applications +3 × resume quality, Energy −5 |
-| 📄 Work on Resume | 1 | Resume +7, Career +2 |
-| 🤝 Network | 1 | Networking +5, Luck +2; 10% chance of a referral |
-| 🎮 Chill With Friends | 1 | Wellbeing +15, Energy +5, Sleep +5 |
-| 🏫 Attend College | 1 | Attendance +4, CGPA +0.03; 20% chance of surprise viva |
-| 📱 Scroll LinkedIn | 1 | Wellbeing −5; 35% chance of a painful post |
-| ☕ Coffee | 0 (max 2/day) | Energy +12, Sleep −8 |
-| 🛋️ Skip Everything | 3 | Big recovery, small DSA & motivation loss |
-
-### Phases
-
-| Days | Arc | Event intensity |
-|------|-----|-----------------|
-| 1–30 | 📚 Preparation Arc | Low |
-| 31–60 | 🔥 Grind Arc | Medium — companies start appearing |
-| 61–80 | 😰 Placement Arc | High — OAs, shortlists, interviews |
-| 81–89 | 💀 Final Boss Arc | Very high |
-| 90 | 🎓 Placement Day | Final result |
-
-### Events
-
-Every action has a chance to trigger an event, and each morning rolls another one. Rarity weights are Common 55%, Uncommon 25%, Rare 12%, Epic 6%, Legendary 2%, with rarer and placement-themed events boosted in later arcs. Events can have fixed effects, conditional effects (e.g. a company visit helps if DSA > 50 and hurts otherwise), or player choices. The same event never repeats within six rolls.
-
-### Placement score
-
-On Day 90 a hidden weighted formula over DSA, CGPA, Projects, Interview, Resume, Networking, Applications and Luck produces a 0–100 score, nudged by Wellbeing and any offers you collected during the season. The score maps to seven endings from *"Placement Season Defeated You"* (₹0 LPA) to *"Campus Legend"* (₹25+ LPA).
-
-### Balance
-
-`scripts/sim.ts` plays 40 seeded runs per strategy. A perfectly balanced bot scores ~89, a chaotic random player ~73, single-focus specialists ~55, and a sleep-only run ~33. Every strategy can finish; none is dominant.
-
-## 📁 Project Structure
-
-```
-src/
-  components/
-    GameHeader.tsx        top bar: title, day counter, phase pill, sound/settings
-    GameScreen.tsx        main dashboard layout + keyboard shortcuts + mobile bar
-    StatCard.tsx          animated stat card with status line and delta badge
-    StatBar.tsx           animated progress bar
-    DayProgress.tsx       "Placement Day" countdown bar
-    ActionCard.tsx        action button with effect chips and cost dots
-    EventModal.tsx        pause-the-game event dialog (fixed or choice-based)
-    ActivityLog.tsx       timestamped log (collapsible on mobile)
-    FloatingNumbers.tsx   floating "+6 🧠 / −12 ⚡" feedback
-    AchievementToast.tsx  toast stack for achievements / info / errors
-    Confetti.tsx          lightweight CSS confetti
-    StartScreen.tsx       landing screen with continue / new game confirmation
-    Tutorial.tsx          6-step skippable tutorial
-    GameOverScreen.tsx    dramatic "Placement Day" reveal
-    PlacementResult.tsx   final result, radar chart, season summary, share
-    RadarChart.tsx        SVG radar chart
-    Leaderboard.tsx       local top-10 runs
-    AchievementsModal.tsx trophy cabinet
-    SettingsModal.tsx     sound / music / reduced motion / reset
-    Modal.tsx             accessible dialog shell (focus trap, Esc, backdrop)
-  data/
-    actions.ts            action definitions + flavor lines
-    events.ts             event pool + rarity weights
-    achievements.ts       achievement definitions + checks
-    phases.ts             arcs, event intensity, constants
-  hooks/
-    useGameState.ts       React glue: state, persistence, toasts, fx, leaderboard
-    useSound.ts           WebAudio synth
-  types/
-    game.ts               all shared types
-  utils/
-    gameLogic.ts          pure, deterministic game engine
-    scoring.ts            CGPA conversion, career score, placement outcomes
-    random.ts             seeded PRNG (mulberry32)
-    storage.ts            validated LocalStorage save/load
-    share.ts              share-text builder + Web Share / clipboard
-  App.tsx                 view router + modals
-scripts/
-  sim.ts                  headless balance simulation
-```
-
-Game logic lives entirely in `src/utils` and `src/data`; it is pure, seeded and has no React dependency, so it can be simulated headlessly (see `scripts/sim.ts`).
-
-## 📝 License
-
-MIT. Fictional companies, fictional salaries, real feelings.
+- A short second interview format (system design or HR) for tier-three companies.
+- Per-run seed sharing so friends can play the same season.
+- A compact run history alongside best runs.
+- Optional dark theme.

@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { PHASES, TOTAL_DAYS, getPhase } from '../game/balance'
 
 export function DayHero({ day }: { day: number }) {
@@ -11,16 +11,14 @@ export function DayHero({ day }: { day: number }) {
         <div>
           <p className="eyebrow">Day</p>
           <div className="flex items-baseline gap-3">
-            <AnimatePresence mode="popLayout" initial={false}>
-              <motion.span
-                key={day}
-                className="serif text-[88px] sm:text-[120px] leading-[0.85] tnum"
-                initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-              >
-                {day}
-              </motion.span>
-            </AnimatePresence>
+            <motion.span
+              key={day}
+              className="serif text-[88px] sm:text-[120px] leading-[0.85] tnum"
+              initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            >
+              {day}
+            </motion.span>
             <span className="text-muted text-sm sm:text-base tracking-[0.12em] uppercase">of {TOTAL_DAYS}</span>
           </div>
         </div>

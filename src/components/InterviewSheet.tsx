@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion'
+import { motion } from 'framer-motion'
 import type { GameState } from '../types/game'
 import { COMPANY_MAP, QUESTION_MAP } from '../game/companies'
 import { Sheet } from './ui'
@@ -12,9 +12,8 @@ export function InterviewSheet({ state, onAnswer, onClose }: { state: GameState;
       {iv && c && (
         <div className="p-7 sm:p-10">
           <p className="eyebrow">Interview · {c.name} · {c.role}</p>
-          <AnimatePresence mode="wait">
-            {q ? (
-              <motion.div key={q.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.25 }}>
+          {q ? (
+              <motion.div key={q.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}>
                 {iv.lastReply && <p className="mt-4 text-[13px] text-muted italic">{iv.lastReply}</p>}
                 <p className="mt-5 text-[11px] tracking-[0.14em] uppercase text-faint tnum">Question {iv.index + 1} of {iv.questionIds.length}</p>
                 <p className="serif text-[30px] sm:text-[36px] leading-tight mt-2">“{q.prompt}”</p>
@@ -29,7 +28,7 @@ export function InterviewSheet({ state, onAnswer, onClose }: { state: GameState;
                   ))}
                 </ul>
               </motion.div>
-            ) : (
+          ) : (
               <motion.div key="outcome" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}>
                 {iv.lastReply && <p className="mt-4 text-[13px] text-muted italic">{iv.lastReply}</p>}
                 <p className="serif text-[44px] sm:text-[56px] leading-none mt-6">
@@ -42,8 +41,7 @@ export function InterviewSheet({ state, onAnswer, onClose }: { state: GameState;
                 </p>
                 <button onClick={onClose} className="btn btn-primary press mt-8">Continue <span aria-hidden>→</span></button>
               </motion.div>
-            )}
-          </AnimatePresence>
+          )}
         </div>
       )}
     </Sheet>

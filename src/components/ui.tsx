@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import {
   ArrowRight, BookOpen, Code, Coffee, CupSoda, FileText, GraduationCap, Hammer, Mic, Moon, Send, Sofa, Users, X,
   type LucideIcon,
@@ -42,6 +42,7 @@ export function Sheet({
   open, children, onClose, dim = true, width = 'max-w-lg', label,
 }: { open: boolean; children: ReactNode; onClose?: () => void; dim?: boolean; width?: string; label: string }) {
   const ref = useRef<HTMLDivElement>(null)
+  const reduced = useReducedMotion()
   useEffect(() => {
     if (!open) return
     const prev = document.activeElement as HTMLElement | null
@@ -67,6 +68,23 @@ export function Sheet({
       prev?.focus?.()
     }
   }, [open, onClose])
+
+  if (reduced) {
+    if (!open) return null
+    return (
+      <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-6">
+        <button aria-label="Close" tabIndex={-1} className={`absolute inset-0 ${dim ? 'bg-ink/45' : 'bg-ink/10'}`} onClick={onClose} />
+        <div ref={ref} role="dialog" aria-modal="true" aria-label={label} className={`relative w-full ${width} bg-surface border hairline sm:rounded-[18px] rounded-t-[18px] max-h-[92dvh] overflow-y-auto`}>
+          {onClose && (
+            <button onClick={onClose} aria-label="Close" className="absolute right-3 top-3 w-11 h-11 flex items-center justify-center rounded-md text-muted hover:text-ink hover:bg-paper">
+              <X size={18} strokeWidth={1.75} />
+            </button>
+          )}
+          {children}
+        </div>
+      </div>
+    )
+  }
 
   return (
     <AnimatePresence>
