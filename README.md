@@ -27,11 +27,12 @@ Ninety days, three actions a day, six things to balance, a company pipeline with
 
 1. Start. You are on Day 1 with a 7.8 CGPA and unearned confidence.
 2. Each day, spend three actions: practice DSA, study, build a project, sleep, mock interview, fix your resume, network, go out, attend class, apply off-campus. Coffee is free but borrows from tonight. Writing off a day costs all three.
-3. Events interrupt. Some just happen; some ask what you do.
-4. From Day 20, companies start visiting campus. Apply if you clear the bar. Clear the assessment, sit the interview, get the offer or don't.
-5. End the day. See what changed. Start the next one.
-6. Open the calendar (icon in the header) any time to look back at what you did on each day.
-7. On Day 90, the season is scored and the verdict is revealed.
+3. Events interrupt. Some just happen; some ask what you do. Batchmates get placed along the way.
+4. Every Monday you get three weekly goals. Clear all three for a bonus.
+5. From Day 20, companies start visiting campus. Apply if you clear the bar. Clear the assessment, sit the interview, get the offer or don't.
+6. End the day. See what changed. Start the next one.
+7. Open the calendar (icon in the header) any time to look back at what you did on each day.
+8. On Day 90, the season is scored and the verdict is revealed.
 
 Keyboard: `1`–`9` triggers the actions in order, `E` ends the day, `Enter` starts the next day, `Esc` closes sheets.
 
@@ -40,7 +41,7 @@ Keyboard: `1`–`9` triggers the actions in order, `E` ends the day, `Enter` sta
 | Stat | Behaviour |
 |------|-----------|
 | Sleep | Decays every night. Restored by sleeping, drained by coffee, parties and all-nighters. |
-| DSA | Improves slowly with practice. Gains shrink above 30/50/70/85. Fades a little on days you skip. |
+| DSA | The average of four topics: Arrays, Graphs, DP, System design. Practice trains the topic you pick; each topic has its own diminishing returns above 30/50/70/85. Fades a little on days you skip, twice as fast during mid-sems. |
 | CGPA | Shown as 5.0–10.0, stored 0–100. Moves slowly. Drifts down if academics are ignored for long. |
 | Wellbeing | Moves fast. Below 30, worse events and weaker productivity. Above 85, small bonuses. |
 | Career stats | Projects, Resume, Interview, Networking, Applications, plus hidden Luck and Motivation. |
@@ -78,6 +79,38 @@ scripts/sim.ts     headless balance simulation
 ```
 
 Every state transition is a pure function on `GameState`. Randomness comes from a seeded PRNG whose state is saved, so a run is reproducible from its seed.
+
+## Weekly goals
+
+Every Monday (days 1, 8, 15 and so on) the engine picks three goals from your current state:
+
+- a stat push, such as "Reach DSA 45" or "Reach CGPA 8.2", set a little above where you are;
+- a habit, such as "Practise DSA on 4 days" or "Sleep properly on 4 nights";
+- from Day 20, "Apply to 1 company" (2 from Day 40), otherwise "Get DP to 35" for your weakest topic.
+
+Progress updates live in the Week panel above your state. Clearing all three gives +6 Wellbeing, +8 Motivation and +2 Luck, a tick-off screen, and a log line. Unfinished goals simply expire when the next week starts. Mondays are outlined on the calendar.
+
+## Batchmates
+
+Three named batchmates share your season. Each gets placed on a random day in a window fixed by your seed:
+
+| Name | Who | Lands at | Window |
+|------|-----|----------|--------|
+| Rahul | Chill. Never seen him study. Somehow fine. | TCS | days 26 to 44 |
+| Arjun | Grinds LeetCode at 2 AM. Has opinions about graphs. | Amazon | days 50 to 66 |
+| Priya | The topper. Colour-coded notes. Sleeps eight hours. | Microsoft | days 55 to 72 |
+
+Their placement shows in Recently and on that calendar day, costs you a little wellbeing and gives some motivation. Two days after Arjun is placed, if your Networking is 40 or more, he refers you to Amazon: the application skips the cut-off check and goes straight to the assessment.
+
+## Mid-sem week
+
+Days 36 to 42 are exams. Study counts double, attending class counts one and a half times, and DSA fades twice as fast overnight. The day hero shows a red banner with the days remaining, the Study row says so, and the week is striped on the calendar. The trade-off is deliberate: protect your CGPA or protect your DSA.
+
+## DSA skills tree
+
+DSA is no longer one number. It is the average of four topics, each stored separately: Arrays and strings, Graphs and trees, Dynamic programming, System design. The Practice DSA row has a chip per topic showing its score; the selected topic is the one you train. Each topic has its own diminishing returns, so spreading practice pays. The state panel shows four mini bars under DSA.
+
+Every company lists the topics it asks for (for example Amazon asks Graphs and DP, Google asks Graphs, DP and System design). Its assessment pass chance and interview outcome use the average of those topics rather than your overall DSA, while eligibility cut-offs still use the overall number. Weekly goals will sometimes target your weakest topic.
 
 ## Calendar
 
