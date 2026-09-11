@@ -8,7 +8,7 @@ import { ActionDots, ActionList } from './ActionList'
 import { DayHero } from './DayHero'
 import { Opportunities } from './Opportunities'
 import { Recent } from './Recent'
-import { StatePanel } from './StatePanel'
+import { StatePanel, StateStrip } from './StatePanel'
 
 type Props = {
   state: GameState
@@ -67,9 +67,9 @@ export function GameScreen(p: Props) {
   return (
     <div className={`min-h-dvh ${shaking ? 'shake' : ''}`}>
       <header className="max-w-6xl mx-auto px-5 sm:px-8 pt-5 sm:pt-7 flex items-center justify-between">
-        <button onClick={p.onHome} className="press text-[12px] tracking-[0.16em] uppercase font-semibold">Placement Season</button>
+        <button onClick={p.onHome} className="press text-[11px] sm:text-[12px] tracking-[0.16em] uppercase font-semibold whitespace-nowrap">Placement Season</button>
         <div className="flex items-center gap-4">
-          <SavedLabel at={p.savedAt} />
+          <span className="hidden sm:inline"><SavedLabel at={p.savedAt} /></span>
           <button onClick={p.onSettings} aria-label="Settings" className="press w-11 h-11 -mr-2 flex items-center justify-center rounded-md text-muted hover:text-ink hover:bg-surface">
             <Settings2 size={18} strokeWidth={1.75} />
           </button>
@@ -81,7 +81,11 @@ export function GameScreen(p: Props) {
           <DayHero day={state.day} />
           <p className="mt-4 text-[13px] text-muted">{phase.copy}</p>
 
-          <div className="mt-12">
+          <div className="lg:hidden mt-8">
+            <StateStrip state={state} />
+          </div>
+
+          <div className="mt-10 lg:mt-12">
             <ActionList state={state} onAct={p.onAct} hint={p.hint} />
           </div>
 

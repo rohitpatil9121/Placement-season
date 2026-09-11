@@ -59,3 +59,22 @@ export function StatePanel({ state, deltas }: { state: GameState; deltas: Effect
     </section>
   )
 }
+
+/** Compact five-stat strip for narrow screens; the full panel sits below the actions. */
+export function StateStrip({ state }: { state: GameState }) {
+  return (
+    <div className="grid grid-cols-5 border-y hairline py-3" aria-label="Your state, summary">
+      {CORE_KEYS.map((k) => {
+        const isCgpa = k === 'cgpa'
+        const v = state.stats[k]
+        const low = !isCgpa && v < 20
+        return (
+          <div key={k} className="text-center">
+            <p className={`serif text-[22px] leading-none tnum ${low ? 'text-danger' : ''}`}>{isCgpa ? toCgpa(v).toFixed(1) : Math.round(v)}</p>
+            <p className="text-[10px] tracking-[0.1em] uppercase text-muted mt-1">{STAT_LABEL[k]}</p>
+          </div>
+        )
+      })}
+    </div>
+  )
+}

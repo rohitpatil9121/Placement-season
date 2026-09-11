@@ -36,13 +36,17 @@ export function DayHero({ day }: { day: number }) {
             initial={false} animate={{ left: `calc(${pct}% - 4px)` }} transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
           />
         </div>
-        <div className="mt-3 grid grid-cols-4 text-[11px] tracking-[0.1em] uppercase">
+        <div className="mt-3 hidden sm:grid grid-cols-4 text-[11px] tracking-[0.1em] uppercase">
           {PHASES.slice(0, 4).map((p) => (
             <span key={p.id} className={p.id === phase.id ? 'text-ink font-semibold' : 'text-faint'}>
               {p.name}
             </span>
           ))}
         </div>
+        <p className="mt-3 sm:hidden text-[11px] tracking-[0.1em] uppercase">
+          <span className="text-ink font-semibold">{phase.name}</span>
+          {phase.id !== 'day90' && <span className="text-faint"> · {PHASES.findIndex((p) => p.id === phase.id) + 1} of 4</span>}
+        </p>
       </div>
     </section>
   )
