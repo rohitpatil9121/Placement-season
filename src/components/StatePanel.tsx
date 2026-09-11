@@ -6,6 +6,18 @@ import { toCgpa } from '../game/scoring'
 import { Num, fmtDelta } from './ui'
 import { STAT_COLOR } from './theme'
 import { StatIcon } from './StatIcon'
+import { MOOD_LINE, moodFor } from './Mascot'
+
+export function vibeFor(state: GameState): string {
+  const s = state.stats
+  if (s.dsa > 85 && s.cgpa > 70) return 'Annoyingly competent.'
+  if (s.energy < 15 && s.sleep < 30) return 'Running on chai and hope.'
+  if (s.sleep > 85 && s.wellbeing > 80) return 'Suspiciously well-rested.'
+  if (s.wellbeing < 25) return 'One LinkedIn post from crying.'
+  if (state.metrics.offers > 0) return 'Screenshot. Send to family.'
+  if (s.dsa < 35 && state.day > 40) return 'Two Sum is still hard.'
+  return MOOD_LINE[moodFor(s)]
+}
 
 function Row({ k, value, delta, peek }: { k: StatKey; value: number; delta?: number; peek?: number }) {
   const isCgpa = k === 'cgpa'
@@ -53,7 +65,8 @@ export function StatePanel({ state, deltas, peek }: { state: GameState; deltas: 
   return (
     <section aria-label="Your state">
       <p className="eyebrow">Your state</p>
-      <ul className="mt-2">
+      <p className="serif text-[20px] leading-tight mt-1" aria-live="polite">{vibeFor(state)}</p>
+      <ul className="mt-3">
         {CORE_KEYS.map((k) => (
           <Row key={k} k={k} value={state.stats[k]} delta={deltas[k]} peek={peek?.[k]} />
         ))}
