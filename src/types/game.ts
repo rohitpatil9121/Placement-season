@@ -1,95 +1,118 @@
-export type StatKey =
-  | 'energy'
-  | 'dsa'
-  | 'sleep'
-  | 'cgpa'
-  | 'wellbeing'
-  | 'career'
+export type CoreKey = 'energy' | 'sleep' | 'dsa' | 'cgpa' | 'wellbeing'
+export type ProgressKey = 'projects' | 'resume' | 'interview' | 'networking' | 'applications' | 'luck' | 'motivation'
+export type StatKey = CoreKey | ProgressKey
 
-export type HiddenKey =
-  | 'projects'
-  | 'resume'
-  | 'interview'
-  | 'applications'
-  | 'networking'
-  | 'luck'
-  | 'motivation'
-  | 'attendance'
-
-export type AllStatKey = StatKey | HiddenKey
-
-/** All values are stored 0–100. CGPA is displayed as 5.0–10.0. */
-export type GameStats = Record<AllStatKey, number>
-
-export type Effects = Partial<Record<AllStatKey, number>>
+/** Every stat is stored 0–100. CGPA is displayed as 5.0–10.0. */
+export type Stats = Record<StatKey, number>
+export type Effects = Partial<Record<StatKey, number>>
 
 export type Rarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'
 
+export type PhaseId = 'prep' | 'grind' | 'season' | 'final' | 'day90'
 export type Phase = {
-  id: 'prep' | 'grind' | 'placement' | 'boss' | 'day90'
+  id: PhaseId
   name: string
-  emoji: string
   from: number
   to: number
-  glow: string
+  copy: string
   eventChance: number
-  tagline: string
 }
 
 export type ActionId =
-  | 'grind_dsa'
-  | 'deep_sleep'
+  | 'dsa'
   | 'study'
   | 'project'
+  | 'sleep'
   | 'mock'
-  | 'apply'
   | 'resume'
   | 'network'
   | 'chill'
   | 'college'
-  | 'linkedin'
+  | 'apply'
   | 'coffee'
-  | 'recover'
+  | 'rest'
 
 export type Action = {
   id: ActionId
   name: string
   description: string
-  emoji: string
+  icon: string
   cost: number
-  /** static, base effects (dynamic parts live in gameLogic) */
-  effects: Effects
   maxPerDay?: number
-  tag: 'career' | 'academics' | 'rest' | 'social' | 'chaos'
-  flavor: string[]
+  effects: Effects
+  /** shown after the action; picked at random */
+  lines: string[]
+  /** progress keys this action reveals in the state panel */
+  reveals?: ProgressKey[]
 }
 
 export type EventChoice = {
   label: string
   effects: Effects
-  result: string
+  line: string
 }
 
 export type EventCondition = {
   minDay?: number
   maxDay?: number
-  minStat?: Partial<Record<AllStatKey, number>>
-  maxStat?: Partial<Record<AllStatKey, number>>
+  min?: Partial<Stats>
+  max?: Partial<Stats>
 }
 
 export type GameEvent = {
   id: string
   title: string
-  description: string
-  emoji: string
+  body: string
+  /** optional quoted line rendered in serif */
+  quote?: string
   rarity: Rarity
   effects?: Effects
-  /** effects applied only when the condition matches */
-  conditional?: { key: AllStatKey; threshold: number; above: Effects; below: Effects }
+  conditional?: { key: StatKey; threshold: number; above: Effects; below: Effects }
   choices?: EventChoice[]
   condition?: EventCondition
-  tags?: Array<'linkedin' | 'referral' | 'offer' | 'placement' | 'rejection' | 'breakdown'>
-  weight?: number
+  tags?: Array<'linkedin' | 'referral' | 'rejection' | 'breakdown' | 'opportunity' | 'negative' | 'positive'>
+  reveals?: ProgressKey[]
+}
+
+export type CompanyTest = 'dsa' | 'projects' | 'aptitude'
+
+export type Company = {
+  id: string
+  name: string
+  role: string
+  packageLpa: number
+  tagline: string
+  eligibility: Partial<Record<'cgpa' | 'dsa' | 'projects' | 'resume', number>>
+  test: CompanyTest
+  appearsFrom: number
+  appearsTo: number
+  /** 1 = service company, 3 = dream company */
+  tier: 1 | 2 | 3
+}
+
+export type ApplicationStage = 'discovered' | 'applied' | 'oa' | 'shortlisted' | 'interview' | 'offer' | 'rejected'
+
+export type Application = {
+  companyId: string
+  stage: ApplicationStage
+  discoveredDay: number
+  updatedDay: number
+  /** day the next pipeline step fires */
+  nextDay?: number
+  note?: string
+}
+
+export type InterviewOption = { label: string; score: 0 | 1 | 2; reply: string }
+export type InterviewQuestion = { id: string; prompt: string; options: InterviewOption[] }
+
+export type InterviewSession = {
+  companyId: string
+  questionIds: string[]
+  index: number
+  score: number
+  lastReply: string | null
+  /** set when finished */
+  outcome: 'offer' | 'rejected' | null
 }
 
 export type LogEntry = {
@@ -97,68 +120,64 @@ export type LogEntry = {
   day: number
   time: string
   text: string
-  emoji: string
-  kind: 'action' | 'event' | 'system' | 'achievement'
+  kind: 'action' | 'event' | 'system' | 'company' | 'achievement'
 }
 
-export type ResolvedEvent = {
-  event: GameEvent
-  /** effects actually applied (if no choices) */
-  applied?: Effects
-}
-
-export type Counters = {
+export type Metrics = {
   coffees: number
-  dsaProblems: number
+  problemsSolved: number
   applicationsSent: number
-  breakdowns: number
+  interviewsAttended: number
   referrals: number
-  linkedinEvents: number
+  sleepSacrificed: number
+  hoursStudied: number
+  projectsCompleted: number
+  rejections: number
   offers: number
+  breakdowns: number
+  linkedinEvents: number
   firstOfferDay: number | null
   lowSleepDays: number
-  sleepTotal: number
   highWellbeingDays: number
-  mocksDone: number
-  projectsBuilt: number
-  chillDays: number
-  vivas: number
-  rejections: number
-  daysAtZeroEnergy: number
+  balancedDays: number
+  sleepTotal: number
+  zeroEnergyHits: number
   careerBonus: number
   eventsSeen: number
-  actionsTaken: number
 }
 
-export type FloatingDelta = { id: number; key: AllStatKey; delta: number }
+export type DaySummary = {
+  day: number
+  deltas: Effects
+  events: number
+}
 
 export type Settings = {
   sound: boolean
-  music: boolean
   reducedMotion: boolean
-  tutorialDone: boolean
+  seenFirstDayHint: boolean
 }
 
 export type Outcome = {
   min: number
   max: number
   title: string
-  subtitle: string
-  emoji: string
+  line: string
   salaryRange: [number, number]
-  color: string
   role: string
 }
 
 export type PlacementResult = {
   score: number
   outcome: Outcome
+  placed: boolean
   salaryLpa: number
   company: string
   role: string
+  viaOffer: boolean
 }
 
-export type GameStatus = 'start' | 'tutorial' | 'playing' | 'finished'
+export type GameStatus = 'playing' | 'dayEnd' | 'finished'
 
 export type GameState = {
   version: number
@@ -166,15 +185,21 @@ export type GameState = {
   rngState: number
   status: GameStatus
   day: number
-  actionsLeft: number
-  stats: GameStats
-  counters: Counters
-  actionsUsedToday: Partial<Record<ActionId, number>>
+  actionsRemaining: number
+  stats: Stats
+  dayStartStats: Stats
+  revealed: ProgressKey[]
+  metrics: Metrics
+  usedToday: Partial<Record<ActionId, number>>
   log: LogEntry[]
   achievements: string[]
   eventHistory: string[]
-  pendingEvent: ResolvedEvent | null
-  finalResult: PlacementResult | null
+  activeEvent: GameEvent | null
+  interview: InterviewSession | null
+  applications: Application[]
+  daySummary: DaySummary | null
+  dayEventCount: number
+  result: PlacementResult | null
   lastLogId: number
   startedAt: number
 }
@@ -183,7 +208,14 @@ export type Achievement = {
   id: string
   name: string
   description: string
-  emoji: string
   check: (state: GameState) => boolean
-  secret?: boolean
+}
+
+export type BestRuns = {
+  bestScore: number
+  bestSalary: number
+  bestDsa: number
+  bestCgpa: number
+  mostChaotic: number
+  runs: number
 }

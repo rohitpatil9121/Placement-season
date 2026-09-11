@@ -1,46 +1,47 @@
 import type { GameState } from '../types/game'
-import { toCgpa } from './scoring'
+import { toCgpa } from '../game/scoring'
 
-export function buildShareText(state: GameState): string {
-  const r = state.finalResult
+export function shareText(state: GameState): string {
+  const r = state.result
   const s = state.stats
-  const c = state.counters
-  const offer = r && r.salaryLpa > 0 ? `₹${r.salaryLpa} LPA @ ${r.company}` : 'No offer (yet) 😭'
+  const m = state.metrics
+  const offer = r?.placed ? `₹${r.salaryLpa} LPA · ${r.role}${r.company ? ` · ${r.company}` : ''}` : 'Not placed. Yet.'
   return [
-    '🎓 PLACEMENT SEASON',
-    `I survived ${state.day} days.`,
+    'PLACEMENT SEASON — 90 DAYS',
     '',
-    `💰 Offer: ${offer}`,
-    `🧠 DSA: ${Math.round(s.dsa)}`,
-    `📚 CGPA: ${toCgpa(s.cgpa).toFixed(1)}`,
-    `💻 Projects: ${Math.round(s.projects)}`,
-    `❤️ Mental Health: ${Math.round(s.wellbeing)}`,
-    `☕ Coffees: ${c.coffees}`,
-    `💀 Breakdowns: ${c.breakdowns}`,
+    offer,
     '',
-    `Rating: ${r ? `${r.outcome.emoji} ${r.outcome.title}` : '—'}`,
+    `DSA ${Math.round(s.dsa)}  ·  CGPA ${toCgpa(s.cgpa).toFixed(1)}  ·  Projects ${Math.round(s.projects)}  ·  Interview ${Math.round(s.interview)}`,
+    `Coffee ${m.coffees}  ·  Applications ${m.applicationsSent}  ·  Sleep sacrificed ${m.sleepSacrificed} nights`,
     '',
-    'Can you survive final year? #PlacementSeason',
+    `"${closingLine(r?.score ?? 0)}"`,
   ].join('\n')
+}
+
+export function closingLine(score: number): string {
+  if (score >= 86) return 'Annoyingly competent.'
+  if (score >= 71) return 'Somehow, we made it.'
+  if (score >= 56) return 'Not bad. Not bad at all.'
+  if (score >= 41) return 'A start is a start.'
+  if (score >= 26) return 'The off-campus arc begins.'
+  return 'Placement season won this round.'
 }
 
 export type ShareOutcome = 'shared' | 'copied' | 'failed'
 
-export async function shareResult(text: string): Promise<ShareOutcome> {
+export async function share(text: string): Promise<ShareOutcome> {
   try {
-    if (typeof navigator !== 'undefined' && 'share' in navigator && typeof navigator.share === 'function') {
+    if (typeof navigator !== 'undefined' && typeof navigator.share === 'function' && /Mobi|Android/i.test(navigator.userAgent)) {
       await navigator.share({ title: 'Placement Season', text })
       return 'shared'
     }
   } catch (err) {
-    // user cancelled or share failed — fall through to clipboard
     if ((err as { name?: string })?.name === 'AbortError') return 'failed'
   }
   try {
     await navigator.clipboard.writeText(text)
     return 'copied'
   } catch {
-    // last-resort fallback
     try {
       const ta = document.createElement('textarea')
       ta.value = text
