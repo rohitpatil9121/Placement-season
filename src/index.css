@@ -80,7 +80,7 @@ button:disabled { cursor: not-allowed; }
 }
 .float { animation: float 3s ease-in-out infinite; }
 
-@media (prefers-reduced-motion: reduce), (root[data-reduced-motion="true"]) {
+@media (prefers-reduced-motion: reduce) {
   .shake, .float { animation: none; }
 }
 html[data-reduced-motion="true"] .shake,
