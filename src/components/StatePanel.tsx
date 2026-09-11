@@ -3,16 +3,21 @@ import type { Effects, GameState, StatKey } from '../types/game'
 import { CORE_KEYS, PROGRESS_KEYS, STAT_LABEL } from '../game/balance'
 import { toCgpa } from '../game/scoring'
 import { Num, fmtDelta } from './ui'
+import { STAT_COLOR } from './theme'
+import { StatIcon } from './StatIcon'
 
 function Row({ k, value, delta }: { k: StatKey; value: number; delta?: number }) {
   const isCgpa = k === 'cgpa'
   const shown = isCgpa ? toCgpa(value) : value
   const low = !isCgpa && value < 20
-  const tone = low ? 'bg-danger' : k === 'wellbeing' && value > 85 ? 'bg-success' : 'bg-ink'
+  const color = STAT_COLOR[k]
   return (
     <li className="py-2.5 border-b hairline last:border-b-0">
       <div className="flex items-baseline justify-between gap-3">
-        <span className={`text-[13px] ${low ? 'text-danger font-medium' : 'text-muted'}`}>{STAT_LABEL[k]}{low ? ' · low' : ''}</span>
+        <span className={`inline-flex items-center gap-2 text-[13px] ${low ? 'text-danger font-medium' : 'text-muted'}`}>
+          <StatIcon k={k} value={value} delta={delta} />
+          {STAT_LABEL[k]}{low ? ' · low' : ''}
+        </span>
         <span className="flex items-baseline gap-2">
           {delta !== undefined && Math.abs(delta) >= 0.05 && (
             <motion.span
@@ -26,8 +31,8 @@ function Row({ k, value, delta }: { k: StatKey; value: number; delta?: number })
           <Num value={shown} decimals={isCgpa ? 1 : 0} className="font-semibold text-[15px]" />
         </span>
       </div>
-      <div className="mt-1.5 h-[3px] bg-line rounded-full overflow-hidden" aria-hidden>
-        <motion.div className={`h-full rounded-full ${tone}`} initial={false} animate={{ width: `${Math.max(2, value)}%` }} transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }} />
+      <div className="mt-1.5 h-[5px] bg-line rounded-full overflow-hidden" aria-hidden>
+        <motion.div className="h-full rounded-full" style={{ background: color }} initial={false} animate={{ width: `${Math.max(2, value)}%` }} transition={{ type: 'spring', stiffness: 170, damping: 22 }} />
       </div>
     </li>
   )
@@ -70,8 +75,8 @@ export function StateStrip({ state }: { state: GameState }) {
         const low = !isCgpa && v < 20
         return (
           <div key={k} className="text-center">
-            <p className={`serif text-[22px] leading-none tnum ${low ? 'text-danger' : ''}`}>{isCgpa ? toCgpa(v).toFixed(1) : Math.round(v)}</p>
-            <p className="text-[10px] tracking-[0.1em] uppercase text-muted mt-1">{STAT_LABEL[k]}</p>
+            <p className={`serif text-[22px] leading-none tnum ${low ? 'text-danger' : ''}`} style={low ? undefined : { color: STAT_COLOR[k] }}>{isCgpa ? toCgpa(v).toFixed(1) : Math.round(v)}</p>
+            <p className="text-[10px] tracking-[0.1em] uppercase text-muted mt-1 inline-flex items-center gap-1"><StatIcon k={k} value={v} size={11} />{STAT_LABEL[k]}</p>
           </div>
         )
       })}

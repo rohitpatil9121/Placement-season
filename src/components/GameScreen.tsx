@@ -9,6 +9,7 @@ import { DayHero } from './DayHero'
 import { Opportunities } from './Opportunities'
 import { Recent } from './Recent'
 import { StatePanel, StateStrip } from './StatePanel'
+import { Mascot, moodFor } from './Mascot'
 
 type Props = {
   state: GameState
@@ -43,6 +44,8 @@ export function GameScreen(p: Props) {
   const [shaking, setShaking] = useState(false)
   const blocked = !!state.activeEvent || !!state.interview
   const allUsed = state.actionsRemaining === 0
+  const mood = moodFor(state.stats)
+  const bump = state.metrics.eventsSeen + state.log.length
 
   useEffect(() => {
     if (!p.shake) return
@@ -78,11 +81,12 @@ export function GameScreen(p: Props) {
 
       <main className="max-w-6xl mx-auto px-5 sm:px-8 pt-8 sm:pt-12 pb-28 lg:pb-16 grid lg:grid-cols-[1fr_300px] gap-12 lg:gap-16">
         <div className="min-w-0">
-          <DayHero day={state.day} />
+          <DayHero day={state.day} mood={mood} bump={bump} />
           <p className="mt-4 text-[13px] text-muted">{phase.copy}</p>
 
-          <div className="lg:hidden mt-8">
-            <StateStrip state={state} />
+          <div className="lg:hidden mt-8 flex items-end gap-3">
+            <Mascot mood={mood} bump={bump} size={64} className="shrink-0 -mb-1" />
+            <div className="flex-1 min-w-0"><StateStrip state={state} /></div>
           </div>
 
           <div className="mt-10 lg:mt-12">

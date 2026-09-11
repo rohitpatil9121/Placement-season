@@ -5,6 +5,7 @@ import { ACTIONS } from '../game/actions'
 import { ACTIONS_PER_DAY } from '../game/balance'
 import { canAct, previewAction } from '../game/engine'
 import { EffectList, Icon } from './ui'
+import { ACTION_COLOR } from './theme'
 
 type Props = { state: GameState; onAct: (id: ActionId) => void; hint: boolean }
 
@@ -56,11 +57,11 @@ export function ActionList({ state, onAct, hint }: Props) {
                 onClick={() => onAct(a.id)}
                 disabled={!check.ok}
                 aria-disabled={!check.ok}
-                className="group w-full text-left py-3.5 sm:py-4 flex items-start gap-4 press disabled:opacity-40"
+                className="group w-full text-left py-3.5 sm:py-4 px-2 -mx-2 rounded-[14px] flex items-start gap-4 press card-press disabled:opacity-40 hover:bg-surface/80"
                 whileHover={check.ok ? { x: 3 } : undefined}
                 transition={{ duration: 0.16 }}
               >
-                <span className="mt-0.5 text-muted group-hover:text-ink transition-colors" aria-hidden>
+                <span className="badge" style={{ background: ACTION_COLOR[a.id] }} aria-hidden>
                   <Icon name={a.icon} size={18} />
                 </span>
                 <span className="flex-1 min-w-0">
