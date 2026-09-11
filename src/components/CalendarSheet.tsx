@@ -2,7 +2,7 @@ import { motion } from 'framer-motion'
 import { useState } from 'react'
 import type { ActionId, DayRecord, GameState, StatKey } from '../types/game'
 import { ACTION_MAP } from '../game/actions'
-import { PHASES, STAT_LABEL, TOTAL_DAYS, getPhase } from '../game/balance'
+import { EXAM_WEEK, PHASES, STAT_LABEL, TOTAL_DAYS, getPhase, isExamWeek } from '../game/balance'
 import { toCgpa } from '../game/scoring'
 import { ACTION_COLOR, PHASE_THEME, STAT_COLOR, alpha } from './theme'
 import { Icon, Sheet, fmtDelta } from './ui'
@@ -55,14 +55,15 @@ export function CalendarSheet({ open, onClose, state }: { open: boolean; onClose
                   onClick={() => setSelected(d)}
                   className="press rounded-[10px] p-1.5 text-left min-h-[48px] border-2 disabled:opacity-35"
                   style={{
-                    background: future ? 'transparent' : alpha(th.accent, isSel ? 0.35 : 0.14),
-                    borderColor: isToday ? th.accent : isSel ? th.ink : 'transparent',
+                    background: future ? (isExamWeek(d) ? 'repeating-linear-gradient(135deg, rgba(217,92,92,0.10) 0 4px, transparent 4px 9px)' : 'transparent') : isExamWeek(d) ? `repeating-linear-gradient(135deg, ${alpha('#D95C5C', 0.22)} 0 4px, ${alpha(th.accent, isSel ? 0.35 : 0.14)} 4px 9px)` : alpha(th.accent, isSel ? 0.35 : 0.14),
+                    borderColor: isToday ? th.accent : isSel ? th.ink : (d - 1) % 7 === 0 ? alpha(th.ink, 0.35) : 'transparent',
                   }}
                   whileHover={future ? undefined : { y: -1 }}
                 >
                   <span className="text-[12px] font-bold tnum leading-none" style={{ color: th.ink }}>{d}</span>
                   {r ? <Dots actions={r.actions} /> : isToday ? <Dots actions={state.usedToday} /> : null}
                   {r && r.offers > 0 && <span className="block mt-1 text-[9px] font-bold uppercase tracking-wider" style={{ color: '#7A5A00' }}>Offer</span>}
+                  {state.rivals.some((rv) => rv.placedDay === d && rv.placed) && <span className="block mt-0.5 text-[9px] font-semibold" style={{ color: th.ink }}>{state.rivals.filter((rv) => rv.placedDay === d && rv.placed).map((rv) => rv.name).join(', ')} placed</span>}
                 </motion.button>
               )
             })}
@@ -71,6 +72,16 @@ export function CalendarSheet({ open, onClose, state }: { open: boolean; onClose
             {PHASES.slice(0, 4).map((p) => (
               <span key={p.id} className="inline-flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm" style={{ background: alpha(PHASE_THEME[p.id].accent, 0.4) }} />{p.name}</span>
             ))}
+            <span className="inline-flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm" style={{ background: 'repeating-linear-gradient(135deg, rgba(217,92,92,0.5) 0 2px, transparent 2px 4px)' }} />Mid-sems (days {EXAM_WEEK.from}–{EXAM_WEEK.to})</span>
+            <span className="inline-flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm border" style={{ borderColor: 'var(--color-muted)' }} />Monday, new goals</span>
+          </div>
+          <div className="mt-4 panel p-3">
+            <p className="eyebrow">Batchmates</p>
+            <ul className="mt-1.5 grid sm:grid-cols-3 gap-2 text-[12px]">
+              {state.rivals.map((rv) => (
+                <li key={rv.id}><span className="font-semibold">{rv.name}</span> <span className="text-muted">· {rv.placed ? `placed day ${rv.placedDay}` : 'not placed yet'}</span><br /><span className="text-faint">{rv.line}</span></li>
+              ))}
+            </ul>
           </div>
         </div>
 

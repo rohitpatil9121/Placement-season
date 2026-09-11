@@ -1,6 +1,6 @@
 /* Headless balance simulation: `npx tsx scripts/sim.ts` */
 import type { ActionId, GameState } from '../src/types/game'
-import { createGame, performAction, applyEvent, endDay, startDay, canAct, unlockAchievements, applyToCompany, answerInterview, closeInterview, eligibilityGaps } from '../src/game/engine'
+import { createGame, performAction, applyEvent, endDay, startDay, canAct, unlockAchievements, applyToCompany, answerInterview, closeInterview, eligibilityGaps, setFocus, acknowledgeWeek } from '../src/game/engine'
 import { COMPANY_MAP } from '../src/game/companies'
 import { toCgpa } from '../src/game/scoring'
 
@@ -46,8 +46,10 @@ function run(strategy: Strategy, seed: number) {
     for (const a of s.applications) {
       if (a.stage === 'discovered' && !eligibilityGaps(COMPANY_MAP[a.companyId], s.stats).length) s = applyToCompany(s, a.companyId)
     }
+    if (s.week.cleared && !s.week.celebrated) s = acknowledgeWeek(s)
     {
       let a = strategy(s)
+      if (a === 'dsa') { const ks = ['arrays', 'graphs', 'dp', 'system'] as const; s = setFocus(s, [...ks].sort((x, y) => s.skills[x] - s.skills[y])[0]) }
       if (!canAct(s, a).ok) a = canAct(s, 'sleep').ok ? 'sleep' : canAct(s, 'chill').ok ? 'chill' : a
       const r = canAct(s, a).ok ? performAction(s, a) : { ok: false, state: s }
       if (r.ok) { s = unlockAchievements(r.state).state; continue }

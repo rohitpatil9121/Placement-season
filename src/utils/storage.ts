@@ -36,7 +36,7 @@ const num = (v: unknown): v is number => typeof v === 'number' && Number.isFinit
 export function validate(raw: unknown): GameState | null {
   if (!raw || typeof raw !== 'object') return null
   const s = raw as Partial<GameState>
-  if (s.version !== SAVE_VERSION && s.version !== 4) return null
+  if (s.version !== SAVE_VERSION && s.version !== 4 && s.version !== 5) return null
   if (!num(s.day) || s.day < 1 || s.day > 90) return null
   if (!num(s.actionsRemaining) || s.actionsRemaining < 0) return null
   if (!s.stats || typeof s.stats !== 'object') return null

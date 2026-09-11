@@ -8,6 +8,7 @@ import { Notices } from './components/Notices'
 import { PlacementDay } from './components/PlacementDay'
 import { SettingsSheet } from './components/SettingsSheet'
 import { CalendarSheet } from './components/CalendarSheet'
+import { WeekClearSheet } from './components/WeekPanel'
 import { StartScreen } from './components/StartScreen'
 import { useGame } from './hooks/useGame'
 import { useSound } from './hooks/useSound'
@@ -61,6 +62,7 @@ export default function App() {
             onToggleSound={() => { const on = !(settings.sound || settings.music); g.setSettings({ sound: on, music: on }) }}
             onTrophies={openTrophies}
             onCalendar={() => setCalendarOpen(true)}
+            onFocus={g.setFocus}
             onAct={g.act}
             onEndDay={g.finishDay}
             onApply={g.apply}
@@ -71,6 +73,7 @@ export default function App() {
           />
           <EventSheet state={state} onResolve={g.resolveEvent} />
           <InterviewSheet state={state} onAnswer={g.answer} onClose={g.endInterview} />
+          {!state.activeEvent && !state.interview && <WeekClearSheet state={state} onClose={g.closeWeek} />}
         </>
       )}
 

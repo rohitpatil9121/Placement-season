@@ -2,8 +2,9 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { ActionId, BestRuns, Effects, GameState, Settings } from '../types/game'
 import {
   answerInterview, applyEvent, applyToCompany, canAct, closeInterview, createGame, endDay as endDayFn,
-  ignoreCompany, performAction, sanitize, startDay as startDayFn, unlockAchievements,
+  ignoreCompany, performAction, sanitize, startDay as startDayFn, unlockAchievements, setFocus as setFocusFn, acknowledgeWeek,
 } from '../game/engine'
+import type { SkillKey } from '../types/game'
 import { ACHIEVEMENT_MAP } from '../game/achievements'
 import { toCgpa } from '../game/scoring'
 import { getPhase } from '../game/balance'
@@ -239,6 +240,8 @@ export function useGame(play: (k: SoundKind) => void) {
   }, [])
 
   const markAchievementsSeen = useCallback(() => setUnseenAchievements(0), [])
+  const setFocus = useCallback((k: SkillKey) => { if (state) setState(setFocusFn(state, k)) }, [state])
+  const closeWeek = useCallback(() => { if (state) setState(acknowledgeWeek(state)) }, [state])
 
   const resetRun = useCallback(() => {
     clearSave()
@@ -260,7 +263,7 @@ export function useGame(play: (k: SoundKind) => void) {
   return {
     state, settings, view, notices, lastDeltas, lastLine, shake, nonce, savedAt, best, globalAchievements, corrupted, unseenAchievements,
     startNew, continueGame, home, act, resolveEvent, finishDay, beginDay, apply, ignore, answer, endInterview,
-    setSettings, resetRun, resetAll, dismiss, notify, setView, markAchievementsSeen,
+    setSettings, resetRun, resetAll, dismiss, notify, setView, markAchievementsSeen, setFocus, closeWeek,
   }
 }
 

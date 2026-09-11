@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import { BookOpen, Briefcase, Flame, GraduationCap, Timer, type LucideIcon } from 'lucide-react'
-import { PHASES, TOTAL_DAYS, getPhase } from '../game/balance'
+import { EXAM_WEEK, PHASES, TOTAL_DAYS, getPhase, isExamWeek } from '../game/balance'
 import { Mascot, type Mood } from './Mascot'
 import { PHASE_THEME } from './theme'
 
@@ -39,6 +39,11 @@ export function DayHero({ day, mood, bump }: { day: number; mood: Mood; bump: nu
         </div>
       </div>
 
+      {isExamWeek(day) && (
+        <p className="relative mt-4 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[12px] font-bold text-white" style={{ background: '#D95C5C' }}>
+          Mid-sem week · study counts double · DSA fades faster · {EXAM_WEEK.to - day + 1} day{EXAM_WEEK.to - day === 0 ? '' : 's'} to go
+        </p>
+      )}
       {/* journey path */}
       <div className="mt-10 relative z-[1]" role="progressbar" aria-valuemin={1} aria-valuemax={TOTAL_DAYS} aria-valuenow={day} aria-label="Season progress">
         <div className="relative h-2 rounded-full overflow-hidden" style={{ background: 'var(--color-line)' }}>

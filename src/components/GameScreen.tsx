@@ -10,6 +10,8 @@ import { Opportunities } from './Opportunities'
 import { Recent } from './Recent'
 import { StatePanel, StateStrip } from './StatePanel'
 import { Mascot, moodFor } from './Mascot'
+import { WeekPanel } from './WeekPanel'
+import type { SkillKey } from '../types/game'
 
 type Props = {
   state: GameState
@@ -24,6 +26,7 @@ type Props = {
   onToggleSound: () => void
   onTrophies: () => void
   onCalendar: () => void
+  onFocus: (k: SkillKey) => void
   onAct: (id: ActionId) => void
   onEndDay: () => void
   onApply: (id: string) => void
@@ -110,7 +113,7 @@ export function GameScreen(p: Props) {
           </div>
 
           <div className="mt-8 panel p-5 sm:p-6">
-            <ActionList state={state} onAct={p.onAct} hint={p.hint} deltas={p.deltas} nonce={p.nonce} onPeek={setPeek} />
+            <ActionList state={state} onAct={p.onAct} hint={p.hint} deltas={p.deltas} nonce={p.nonce} onPeek={setPeek} onFocus={p.onFocus} />
           </div>
 
           {p.line && (
@@ -128,6 +131,7 @@ export function GameScreen(p: Props) {
         </div>
 
         <aside className="space-y-5 lg:pt-3">
+          <WeekPanel state={state} />
           <StatePanel state={state} deltas={p.deltas} peek={peek} />
           <Opportunities state={state} onApply={p.onApply} onIgnore={p.onIgnore} live={p.live} />
           <Recent log={state.log} day={state.day} />

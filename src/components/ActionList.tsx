@@ -10,7 +10,9 @@ import { FloatingDeltas } from './FloatingDeltas'
 import type { Effects, StreakKey } from '../types/game'
 import { STREAK_BONUS_AT } from '../game/balance'
 
-type Props = { state: GameState; onAct: (id: ActionId) => void; hint: boolean; deltas: Effects; nonce: number; onPeek?: (e: Effects | null) => void }
+type Props = { state: GameState; onAct: (id: ActionId) => void; hint: boolean; deltas: Effects; nonce: number; onPeek?: (e: Effects | null) => void; onFocus?: (k: SkillKey) => void }
+import type { SkillKey } from '../types/game'
+import { SKILL_LIST, isExamWeek } from '../game/balance'
 
 const STREAK_OF: Partial<Record<ActionId, StreakKey>> = { dsa: 'dsa', study: 'study', college: 'study', sleep: 'sleep' }
 
@@ -35,7 +37,7 @@ export function ActionDots({ remaining }: { remaining: number }) {
   )
 }
 
-export function ActionList({ state, onAct, hint, deltas, nonce, onPeek }: Props) {
+export function ActionList({ state, onAct, hint, deltas, nonce, onPeek, onFocus }: Props) {
   const ticked = Object.values(state.usedToday).reduce((a, b) => a + (b ?? 0), 0)
   return (
     <section aria-label="Today's actions" className="relative">
@@ -100,7 +102,28 @@ export function ActionList({ state, onAct, hint, deltas, nonce, onPeek }: Props)
                       </span>
                     )}
                   </span>
-                  <span className="block text-[13px] text-muted mt-0.5 leading-snug truncate">{a.description}</span>
+                  <span className="block text-[13px] text-muted mt-0.5 leading-snug truncate">{a.id === 'study' && isExamWeek(state.day) ? 'Mid-sems. Counts double this week.' : a.description}</span>
+                  {a.id === 'dsa' && (
+                    <span className="flex flex-wrap gap-1.5 mt-2" role="radiogroup" aria-label="DSA topic to practise" onClick={(e) => e.stopPropagation()}>
+                      {SKILL_LIST.map((sk) => {
+                        const on = state.focus === sk.key
+                        return (
+                          <span
+                            key={sk.key}
+                            role="radio"
+                            aria-checked={on}
+                            tabIndex={0}
+                            onClick={(e) => { e.stopPropagation(); onFocus?.(sk.key) }}
+                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); onFocus?.(sk.key) } }}
+                            className="press cursor-pointer inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[12px] font-semibold border tnum"
+                            style={{ background: on ? color : 'transparent', color: on ? '#fff' : color, borderColor: color }}
+                          >
+                            {sk.short} <span className="opacity-80">{Math.round(state.skills[sk.key])}</span>
+                          </span>
+                        )
+                      })}
+                    </span>
+                  )}
                 </span>
                 <span className="hidden sm:block text-right shrink-0">
                   {check.ok || !check.reason ? <EffectList effects={preview} /> : <span className="text-[12px] text-warn font-medium">{check.reason}</span>}

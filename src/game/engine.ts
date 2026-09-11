@@ -1,14 +1,16 @@
 import type {
   ActionId, Application, Company, DaySummary, Effects, GameEvent, GameState, InterviewSession, LogEntry, Metrics,
-  ProgressKey, Rarity, StatKey, Stats, StreakKey, Streaks, DayRecord,
+  ProgressKey, Rarity, StatKey, Stats, StreakKey, Streaks, DayRecord, SkillKey, Skills,
 } from '../types/game'
+import { evaluateWeek, makeWeek } from './goals'
+import { RIVAL_PLACED_LINES, makeRivals } from './rivals'
 import { ACTION_MAP } from './actions'
 import { EVENTS } from './events'
 import { COMPANIES, COMPANY_MAP, INTERVIEW_QUESTIONS } from './companies'
 import { ACHIEVEMENTS } from './achievements'
 import {
   ACTIONS_PER_DAY, CORE_KEYS, INITIAL_STATS, RARITY_WEIGHTS, SAVE_VERSION, SKILL_KEYS, STREAK_BONUS_AT, TOTAL_DAYS,
-  cgpaTier, getPhase, intensity, interviewPasses, oaPassChance, overnight, skillTier,
+  cgpaTier, getPhase, intensity, interviewPasses, oaPassChance, overnight, skillTier, INITIAL_SKILLS, isExamWeek, skillMean,
 } from './balance'
 import { Rng, randomSeed } from '../utils/random'
 import { buildResult, clamp, fromCgpa } from './scoring'
@@ -29,8 +31,10 @@ export function initialMetrics(): Metrics {
 }
 
 export function createGame(seed = randomSeed()): GameState {
-  const stats = { ...INITIAL_STATS }
-  return {
+  const stats = { ...INITIAL_STATS, dsa: skillMean(INITIAL_SKILLS) }
+  const rng = new Rng(seed)
+  const rivals = makeRivals(rng)
+  const base: GameState = {
     version: SAVE_VERSION,
     seed,
     rngState: seed,
@@ -52,10 +56,46 @@ export function createGame(seed = randomSeed()): GameState {
     dayEventCount: 0,
     streaks: { dsa: 0, study: 0, sleep: 0 },
     history: [],
+    skills: { ...INITIAL_SKILLS },
+    focus: 'arrays',
+    week: { start: 1, goals: [], days: {}, applied: 0, cleared: false, celebrated: false },
+    rivals,
     result: null,
     lastLogId: 1,
     startedAt: Date.now(),
   }
+  return { ...base, week: makeWeek(base, 1, rng), rngState: rng.state }
+}
+
+/** Keep the four DSA topics and the aggregate in step after any change to `dsa`. */
+function reconcileSkills(state: GameState): GameState {
+  const mean = skillMean(state.skills)
+  const diff = Math.round((state.stats.dsa - mean) * 100) / 100
+  if (Math.abs(diff) < 0.005) return state
+  const skills: Skills = { ...state.skills }
+  for (const k of Object.keys(skills) as SkillKey[]) skills[k] = clamp(Math.round((skills[k] + diff) * 100) / 100)
+  return { ...state, skills, stats: { ...state.stats, dsa: skillMean(skills) } }
+}
+
+/** Re-evaluate weekly goals; award the bonus once when all three are done. */
+function refreshWeek(state: GameState): GameState {
+  if (!state.week.goals.length) return state
+  const week = evaluateWeek(state)
+  if (!week.cleared && week.goals.every((g) => g.done)) {
+    const applied = applyEffects(state.stats, { wellbeing: 6, motivation: 8, luck: 2 })
+    let next: GameState = { ...state, stats: applied.stats, week: { ...week, cleared: true } }
+    next = log(next, { time: '—', text: 'Weekly goals cleared. Small bonus, big smugness.', kind: 'achievement' })
+    return next
+  }
+  return { ...state, week }
+}
+
+export function setFocus(state: GameState, focus: SkillKey): GameState {
+  return state.focus === focus ? state : { ...state, focus }
+}
+
+export function acknowledgeWeek(state: GameState): GameState {
+  return { ...state, week: { ...state.week, celebrated: true } }
 }
 
 /* ------------------------------------------------------------------ */
@@ -128,10 +168,11 @@ export function previewAction(state: GameState, id: ActionId): Effects {
   const round = (v: number) => Math.round(v * 10) / 10
   switch (id) {
     case 'dsa':
-      e.dsa = round(6 * sleepMod * energyMod * moodMod * skillTier(s.dsa))
+      // shown as the change to the aggregate: the focused topic gains, the mean moves by a quarter of it
+      e.dsa = round((6 * sleepMod * energyMod * moodMod * skillTier(state.skills[state.focus])) / 4)
       break
     case 'study':
-      e.cgpa = round(1.7 * sleepMod * energyMod * cgpaTier(s.cgpa))
+      e.cgpa = round(1.7 * sleepMod * energyMod * cgpaTier(s.cgpa) * (isExamWeek(state.day) ? 2 : 1))
       break
     case 'project':
       e.projects = round(5 * energyMod * skillTier(s.projects))
@@ -147,6 +188,9 @@ export function previewAction(state: GameState, id: ActionId): Effects {
       break
     case 'apply':
       e.applications = round(3 * energyMod * (0.6 + s.resume / 150))
+      break
+    case 'college':
+      if (isExamWeek(state.day)) e.cgpa = round((action.effects.cgpa ?? 0) * 1.5 * cgpaTier(s.cgpa))
       break
     case 'sleep':
       if (s.sleep > 85) e.sleep = 8
@@ -186,7 +230,19 @@ export function performAction(state: GameState, id: ActionId): ActionResult {
   const rng = new Rng(state.rngState)
   const preview = previewAction(state, id)
   const effects = rawFromPreview(state, id, preview, rng)
-  const applied = applyEffects(state.stats, effects)
+  let skills: Skills = state.skills
+  if (id === 'dsa') {
+    const gainMean = Math.max(0.2, Math.round((preview.dsa ?? 1) * (0.85 + rng.next() * 0.3) * 10) / 10)
+    skills = { ...state.skills, [state.focus]: clamp(Math.round((state.skills[state.focus] + gainMean * 4) * 100) / 100) }
+    effects.dsa = skillMean(skills) - state.stats.dsa
+  }
+  const applied = applyEffects(state.stats, id === 'dsa' ? { ...effects, dsa: undefined } : effects)
+  if (id === 'dsa') {
+    const before = applied.stats.dsa
+    applied.stats.dsa = skillMean(skills)
+    const d = Math.round((applied.stats.dsa - before) * 100) / 100
+    if (d !== 0) applied.deltas.dsa = d
+  }
 
   const m: Metrics = { ...state.metrics }
   if (id === 'coffee') m.coffees += 1
@@ -200,6 +256,7 @@ export function performAction(state: GameState, id: ActionId): ActionResult {
   let next: GameState = {
     ...state,
     stats: applied.stats,
+    skills,
     metrics: m,
     actionsRemaining: state.actionsRemaining - action.cost,
     usedToday: { ...state.usedToday, [id]: (state.usedToday[id] ?? 0) + 1 },
@@ -233,6 +290,7 @@ export function performAction(state: GameState, id: ActionId): ActionResult {
     if (ev) next = { ...next, activeEvent: ev, dayEventCount: next.dayEventCount + 1 }
   }
 
+  next = refreshWeek(reconcileSkills(next))
   return { state: { ...next, rngState: rng.state }, deltas, line, ok: true }
 }
 
@@ -314,6 +372,7 @@ export function applyEvent(state: GameState, choiceIndex?: number): EventResolut
   }
   next = reveal(next, ev.reveals)
   next = log(next, { time: timeFor(state, 1), text: `${ev.title}. ${line || summarize(applied.deltas)}`.trim(), kind: 'event' })
+  next = refreshWeek(reconcileSkills(next))
   return { state: next, deltas: applied.deltas, line }
 }
 
@@ -354,6 +413,7 @@ export function applyToCompany(state: GameState, companyId: string): GameState {
     stats: applyEffects(state.stats, { applications: 2, motivation: 2 }).stats,
   }
   next = reveal(next, ['applications'])
+  next = refreshWeek({ ...next, week: { ...next.week, applied: next.week.applied + 1 } })
   return log(next, { time: timeFor(state), text: `Applied to ${company.name}. Online assessment in ${nextDay - state.day} day${nextDay - state.day === 1 ? '' : 's'}.`, kind: 'company' })
 }
 
@@ -379,7 +439,7 @@ function processCompanies(state: GameState, rng: Rng): GameState {
     if (app.nextDay === undefined || app.nextDay > day) continue
     const c = COMPANY_MAP[app.companyId]
     if (app.stage === 'applied') {
-      const pass = rng.chance(oaPassChance(next.stats, c.test, c.tier))
+      const pass = rng.chance(oaPassChance(next.stats, c.test, c.tier, askedDsa(next, c)))
       if (pass) {
         const interviewDay = day + rng.int(1, 2)
         next = updateApp(next, app.companyId, { stage: 'shortlisted', updatedDay: day, nextDay: interviewDay, note: `Interview on day ${interviewDay}` })
@@ -398,6 +458,12 @@ function processCompanies(state: GameState, rng: Rng): GameState {
     }
   }
   return next
+}
+
+/** Average of the DSA topics a company asks for; the aggregate when it does not say. */
+export function askedDsa(state: GameState, c: Company): number {
+  if (!c.asks?.length) return state.stats.dsa
+  return c.asks.reduce((a, k) => a + state.skills[k], 0) / c.asks.length
 }
 
 function updateApp(state: GameState, companyId: string, patch: Partial<Application>): GameState {
@@ -429,7 +495,7 @@ export function answerInterview(state: GameState, optionIndex: number): GameStat
 
   const rng = new Rng(state.rngState)
   const c = COMPANY_MAP[iv.companyId]
-  const passed = interviewPasses(session.score, state.stats, c.tier, rng.next())
+  const passed = interviewPasses(session.score, state.stats, c.tier, rng.next(), askedDsa(state, c))
   let next: GameState = { ...state, rngState: rng.state, interview: { ...session, outcome: passed ? 'offer' : 'rejected' } }
   const m = { ...next.metrics, interviewsAttended: next.metrics.interviewsAttended + 1 }
   if (passed) {
@@ -460,7 +526,9 @@ export function closeInterview(state: GameState): GameState {
 export function endDay(state: GameState): GameState {
   if (state.status !== 'playing' || state.activeEvent || state.interview) return state
   const s = state.stats
-  const recovery = overnight(s, !!state.usedToday.sleep, !!state.usedToday.dsa, !!(state.usedToday.study || state.usedToday.college))
+  const recovery = overnight(s, !!state.usedToday.sleep, !!state.usedToday.dsa, !!(state.usedToday.study || state.usedToday.college), isExamWeek(state.day))
+  const weekDays = { ...state.week.days }
+  for (const [k, n] of Object.entries(state.usedToday) as [ActionId, number][]) if (n > 0) weekDays[k] = (weekDays[k] ?? 0) + 1
 
   // streaks: consecutive days of the same habit; a small bonus once a streak is established
   const did: Record<StreakKey, boolean> = { dsa: !!state.usedToday.dsa, study: !!(state.usedToday.study || state.usedToday.college), sleep: !!state.usedToday.sleep }
@@ -499,11 +567,11 @@ export function endDay(state: GameState): GameState {
 
   if (nextDay >= TOTAL_DAYS) {
     const result = buildResult(applied.stats, m.careerBonus, state.applications, state.seed)
-    let next: GameState = { ...state, stats: applied.stats, metrics: m, day: TOTAL_DAYS, status: 'finished', result, daySummary: summary, streaks, history }
+    let next: GameState = { ...state, stats: applied.stats, metrics: m, day: TOTAL_DAYS, status: 'finished', result, daySummary: summary, streaks, history, week: { ...state.week, days: weekDays } }
     next = log(next, { time: '09:00', text: 'Placement day.', kind: 'system' })
     return next
   }
-  return { ...state, stats: applied.stats, metrics: m, status: 'dayEnd', daySummary: summary, streaks, history }
+  return refreshWeek(reconcileSkills({ ...state, stats: applied.stats, metrics: m, status: 'dayEnd', daySummary: summary, streaks, history, week: { ...state.week, days: weekDays } }))
 }
 
 /** Start the next day after the transition screen. */
@@ -525,6 +593,39 @@ export function startDay(state: GameState): GameState {
   const phase = getPhase(day)
   if (phase.id !== getPhase(state.day).id) next = log(next, { time: '08:01', text: `${phase.name}. ${phase.copy}`, kind: 'system' })
 
+  // a new week every seven days: fresh goals
+  if ((day - 1) % 7 === 0) {
+    next = { ...next, week: makeWeek(next, day, rng) }
+    next = log(next, { time: '08:02', text: `New week. Three goals: ${next.week.goals.map((g) => g.label.toLowerCase()).join(', ')}.`, kind: 'system' })
+  }
+  if (day === 36) next = log(next, { time: '08:03', text: 'Mid-sems start. Study counts double this week. DSA fades faster. Choose.', kind: 'system' })
+  if (day === 43) next = log(next, { time: '08:03', text: 'Mid-sems over. You survived. Marks pending, as always.', kind: 'system' })
+
+  // batchmates get placed; one of them can refer you
+  for (const r of next.rivals) {
+    if (!r.placed && day >= r.placedDay) {
+      const c = COMPANY_MAP[r.companyId]
+      next = { ...next, rivals: next.rivals.map((x) => (x.id === r.id ? { ...x, placed: true } : x)) }
+      next = log(next, { time: '08:05', text: `${rng.pick(RIVAL_PLACED_LINES[r.id] ?? [`${r.name} got placed.`])}${c ? ` ${c.name}, ₹${c.packageLpa} LPA.` : ''}`, kind: 'company' })
+      next = { ...next, stats: applyEffects(next.stats, { wellbeing: -4, motivation: 5 }).stats }
+    }
+    if (r.canRefer && r.placed && !r.referred && day >= r.placedDay + 2 && next.stats.networking >= 40) {
+      const c = COMPANY_MAP[r.companyId]
+      const known = next.applications.some((a) => a.companyId === r.companyId)
+      if (c && !known) {
+        const oaDay = day + rng.int(1, 3)
+        next = {
+          ...next,
+          rivals: next.rivals.map((x) => (x.id === r.id ? { ...x, referred: true } : x)),
+          applications: [...next.applications, { companyId: c.id, stage: 'applied', discoveredDay: day, updatedDay: day, nextDay: oaDay, note: `Referred by ${r.name} · assessment on day ${oaDay}` }],
+          metrics: { ...next.metrics, referrals: next.metrics.referrals + 1 },
+        }
+        next = reveal(next, ['networking', 'applications'])
+        next = log(next, { time: '08:06', text: `${r.name} referred you to ${c.name}. No cut-off check. Assessment in ${oaDay - day} day${oaDay - day === 1 ? '' : 's'}. Okay. That is interesting.`, kind: 'company' })
+      }
+    }
+  }
+
   next = processCompanies(next, rng)
 
   if (!next.interview) {
@@ -535,7 +636,7 @@ export function startDay(state: GameState): GameState {
       if (ev) next = { ...next, activeEvent: ev, dayEventCount: 1 }
     }
   }
-  return { ...next, rngState: rng.state }
+  return refreshWeek({ ...next, rngState: rng.state })
 }
 
 const morningLines = (day: number, s: Stats): string[] => {
@@ -591,6 +692,10 @@ export function sanitize(state: GameState): GameState {
     dayEventCount: state.dayEventCount ?? 0,
     streaks: { ...{ dsa: 0, study: 0, sleep: 0 }, ...(state.streaks ?? {}) },
     history: Array.isArray(state.history) ? state.history : [],
+    skills: state.skills && typeof state.skills === 'object' ? { ...INITIAL_SKILLS, ...state.skills } : (() => { const d = clamp(Number(state.stats?.dsa) || 30); return { arrays: d, graphs: d, dp: d, system: d } })(),
+    focus: state.focus ?? 'arrays',
+    week: state.week && Array.isArray(state.week.goals) ? state.week : { start: state.day, goals: [], days: {}, applied: 0, cleared: true, celebrated: true },
+    rivals: Array.isArray(state.rivals) ? state.rivals : makeRivals(new Rng(state.seed ^ 0x51ed)),
     version: SAVE_VERSION,
   }
 }

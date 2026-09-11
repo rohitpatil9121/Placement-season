@@ -26,7 +26,8 @@ function validCompany(c: unknown): c is Company {
     !!x.eligibility && typeof x.eligibility === 'object' &&
     typeof x.test === 'string' && TESTS.has(x.test) &&
     num(x.appearsFrom) && num(x.appearsTo) && x.appearsFrom >= 1 && x.appearsTo <= 90 && x.appearsFrom <= x.appearsTo &&
-    (x.tier === 1 || x.tier === 2 || x.tier === 3)
+    (x.tier === 1 || x.tier === 2 || x.tier === 3) &&
+    (x.asks === undefined || (Array.isArray(x.asks) && x.asks.every((a) => ['arrays', 'graphs', 'dp', 'system'].includes(a as string))))
   )
 }
 

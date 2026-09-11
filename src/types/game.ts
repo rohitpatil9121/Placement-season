@@ -88,6 +88,44 @@ export type Company = {
   appearsTo: number
   /** 1 = service company, 3 = dream company */
   tier: 1 | 2 | 3
+  /** DSA topics this company's assessment and interview lean on */
+  asks?: SkillKey[]
+}
+
+export type SkillKey = 'arrays' | 'graphs' | 'dp' | 'system'
+export type Skills = Record<SkillKey, number>
+
+export type GoalKind = 'stat' | 'skill' | 'days' | 'apply'
+export type Goal = {
+  id: string
+  kind: GoalKind
+  label: string
+  /** stat key, skill key, or action id depending on kind */
+  key: string
+  target: number
+  progress: number
+  done: boolean
+}
+export type Week = {
+  start: number
+  goals: Goal[]
+  /** days this week on which each action was ticked */
+  days: Partial<Record<ActionId, number>>
+  applied: number
+  cleared: boolean
+  celebrated: boolean
+}
+
+export type Rival = {
+  id: string
+  name: string
+  line: string
+  companyId: string
+  placedDay: number
+  placed: boolean
+  /** the friend who can refer you */
+  canRefer: boolean
+  referred: boolean
 }
 
 export type ApplicationStage = 'discovered' | 'applied' | 'oa' | 'shortlisted' | 'interview' | 'offer' | 'rejected'
@@ -218,6 +256,10 @@ export type GameState = {
   dayEventCount: number
   streaks: Streaks
   history: DayRecord[]
+  skills: Skills
+  focus: SkillKey
+  week: Week
+  rivals: Rival[]
   result: PlacementResult | null
   lastLogId: number
   startedAt: number

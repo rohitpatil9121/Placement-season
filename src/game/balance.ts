@@ -3,7 +3,21 @@ import type { Phase, Stats, StatKey } from '../types/game'
 export const TOTAL_DAYS = 90
 /** No daily cap: energy is the budget. Kept as a large number so the cost bookkeeping still works. */
 export const ACTIONS_PER_DAY = 99
-export const SAVE_VERSION = 5
+export const SAVE_VERSION = 6
+
+/** Mid-semester exams: study counts double, DSA fades faster. */
+export const EXAM_WEEK = { from: 36, to: 42 }
+export const isExamWeek = (day: number) => day >= EXAM_WEEK.from && day <= EXAM_WEEK.to
+
+export const SKILL_LIST: Array<{ key: 'arrays' | 'graphs' | 'dp' | 'system'; label: string; short: string }> = [
+  { key: 'arrays', label: 'Arrays & strings', short: 'Arrays' },
+  { key: 'graphs', label: 'Graphs & trees', short: 'Graphs' },
+  { key: 'dp', label: 'Dynamic programming', short: 'DP' },
+  { key: 'system', label: 'System design', short: 'System' },
+]
+export const SKILL_LABEL: Record<'arrays' | 'graphs' | 'dp' | 'system', string> = { arrays: 'Arrays', graphs: 'Graphs', dp: 'DP', system: 'System design' }
+export const INITIAL_SKILLS = { arrays: 40, graphs: 26, dp: 20, system: 34 }
+export const skillMean = (s: { arrays: number; graphs: number; dp: number; system: number }) => Math.round(((s.arrays + s.graphs + s.dp + s.system) / 4) * 100) / 100
 export const STREAK_BONUS_AT = 3
 
 export const PHASES: Phase[] = [
@@ -76,7 +90,7 @@ export function cgpaTier(value: number): number {
 export const RARITY_WEIGHTS = { common: 55, uncommon: 25, rare: 12, epic: 6, legendary: 2 } as const
 
 /** Overnight recovery. Sleep quality drives everything. */
-export function overnight(stats: Stats, sleptToday: boolean, practicedDsa: boolean, studied: boolean) {
+export function overnight(stats: Stats, sleptToday: boolean, practicedDsa: boolean, studied: boolean, exam = false) {
   const q = stats.sleep / 100
   const r: Partial<Record<StatKey, number>> = {
     energy: Math.round(6 + 14 * q),
@@ -93,23 +107,23 @@ export function overnight(stats: Stats, sleptToday: boolean, practicedDsa: boole
     r.energy = Math.round((r.energy ?? 0) * 0.4)
     r.cgpa = -0.5
   }
-  if (!practicedDsa && stats.dsa > 30) r.dsa = (r.dsa ?? 0) - Math.round((0.3 + stats.dsa / 100) * 10) / 10
+  if (!practicedDsa && stats.dsa > 30) r.dsa = (r.dsa ?? 0) - Math.round((0.3 + stats.dsa / 100) * (exam ? 2 : 1) * 10) / 10
   if (!studied && stats.cgpa > 40) r.cgpa = (r.cgpa ?? 0) - 0.22
   if (stats.motivation < 15) r.dsa = (r.dsa ?? 0) - 1
   return r
 }
 
 /** Probability of clearing an online assessment. */
-export function oaPassChance(stats: Stats, test: 'dsa' | 'projects' | 'aptitude', tier: number): number {
-  const base = test === 'dsa' ? stats.dsa : test === 'projects' ? (stats.projects * 0.7 + stats.resume * 0.3) : (stats.cgpa * 0.5 + stats.dsa * 0.3 + stats.wellbeing * 0.2)
+export function oaPassChance(stats: Stats, test: 'dsa' | 'projects' | 'aptitude', tier: number, askedDsa = stats.dsa): number {
+  const base = test === 'dsa' ? askedDsa : test === 'projects' ? (stats.projects * 0.7 + stats.resume * 0.3) : (stats.cgpa * 0.5 + stats.dsa * 0.3 + stats.wellbeing * 0.2)
   const p = 0.15 + (base / 100) * 0.8 + stats.luck / 400 - (tier - 1) * 0.12 - (stats.energy < 15 ? 0.1 : 0)
   return Math.max(0.05, Math.min(0.95, p))
 }
 
 /** Interview pass threshold out of 6 (3 questions × 2), softened by skill. */
-export function interviewPasses(score: number, stats: Stats, tier: number, roll: number): boolean {
+export function interviewPasses(score: number, stats: Stats, tier: number, roll: number, askedDsa = stats.dsa): boolean {
   const skill = stats.interview / 100
-  const value = score / 6 + skill * 0.35 + (stats.wellbeing < 25 ? -0.1 : 0) + roll * 0.15
+  const value = score / 6 + skill * 0.35 + (stats.wellbeing < 25 ? -0.1 : 0) + roll * 0.15 + (askedDsa - stats.dsa) / 400
   const need = 0.55 + (tier - 1) * 0.12
   return value >= need
 }

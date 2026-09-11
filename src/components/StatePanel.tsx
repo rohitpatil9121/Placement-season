@@ -7,6 +7,7 @@ import { Num, fmtDelta } from './ui'
 import { STAT_COLOR } from './theme'
 import { StatIcon } from './StatIcon'
 import { MOOD_LINE, moodFor } from './Mascot'
+import { SKILL_LIST } from '../game/balance'
 
 export function vibeFor(state: GameState): string {
   const s = state.stats
@@ -68,7 +69,21 @@ export function StatePanel({ state, deltas, peek }: { state: GameState; deltas: 
       <p className="serif text-[26px] leading-tight mt-1" aria-live="polite">{vibeFor(state)}</p>
       <ul className="mt-3">
         {CORE_KEYS.filter((k) => k !== 'energy').map((k) => (
-          <Row key={k} k={k} value={state.stats[k]} delta={deltas[k]} peek={peek?.[k]} />
+          <li key={k} className="contents">
+            <Row k={k} value={state.stats[k]} delta={deltas[k]} peek={peek?.[k]} />
+            {k === 'dsa' && (
+              <li className="pb-3 -mt-1 grid grid-cols-2 gap-x-4 gap-y-1.5" aria-label="DSA topics">
+                {SKILL_LIST.map((sk) => (
+                  <span key={sk.key} className="text-[11px] text-muted">
+                    <span className="flex justify-between"><span>{sk.short}{state.focus === sk.key ? ' ·' : ''}</span><span className="tnum text-ink font-semibold">{Math.round(state.skills[sk.key])}</span></span>
+                    <span className="block h-[4px] rounded-full mt-1 overflow-hidden" style={{ background: 'color-mix(in srgb, #8B5CF6 14%, var(--color-line))' }} aria-hidden>
+                      <motion.span className="block h-full rounded-full" style={{ background: STAT_COLOR.dsa, opacity: state.focus === sk.key ? 1 : 0.6 }} initial={false} animate={{ width: `${Math.max(2, state.skills[sk.key])}%` }} transition={{ type: 'spring', stiffness: 170, damping: 22 }} />
+                    </span>
+                  </span>
+                ))}
+              </li>
+            )}
+          </li>
         ))}
       </ul>
       {career.length > 0 && (

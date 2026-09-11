@@ -3,6 +3,7 @@ import type { ApplicationStage, GameState } from '../types/game'
 import { COMPANIES, COMPANY_MAP } from '../game/companies'
 import { eligibilityGaps } from '../game/engine'
 import { GOLD, TIER_COLOR, alpha } from './theme'
+import { SKILL_LABEL } from '../game/balance'
 
 const STAGES: ApplicationStage[] = ['applied', 'oa', 'shortlisted', 'interview', 'offer']
 const STAGE_LABEL: Record<ApplicationStage, string> = {
@@ -90,6 +91,7 @@ export function Opportunities({ state, onApply, onIgnore, live }: { state: GameS
                     </span>
                   </div>
                   <p className="text-[13px] text-muted mt-0.5">{c.role} · <span className="font-semibold text-ink tnum">₹{c.packageLpa} LPA</span></p>
+                  {c.asks?.length ? <p className="text-[11px] mt-1" style={{ color: '#6D3FD6' }}>Asks: {c.asks.map((k) => SKILL_LABEL[k]).join(', ')}</p> : null}
                   {a.stage === 'discovered' ? (
                     <div className="mt-2">
                       <p className="text-[12px] text-muted italic">{c.tagline}</p>
