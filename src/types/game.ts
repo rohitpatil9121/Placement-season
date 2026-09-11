@@ -125,6 +125,9 @@ export type Counters = {
   vivas: number
   rejections: number
   daysAtZeroEnergy: number
+  careerBonus: number
+  eventsSeen: number
+  actionsTaken: number
 }
 
 export type FloatingDelta = { id: number; key: AllStatKey; delta: number }
