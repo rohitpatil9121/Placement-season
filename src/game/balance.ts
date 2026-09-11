@@ -2,7 +2,8 @@ import type { Phase, Stats, StatKey } from '../types/game'
 
 export const TOTAL_DAYS = 90
 export const ACTIONS_PER_DAY = 3
-export const SAVE_VERSION = 4
+export const SAVE_VERSION = 5
+export const STREAK_BONUS_AT = 3
 
 export const PHASES: Phase[] = [
   { id: 'prep', name: 'Preparation', from: 1, to: 30, copy: "There's still time.", eventChance: 0.26 },

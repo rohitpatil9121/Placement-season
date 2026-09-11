@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Medal } from 'lucide-react'
 import type { BestRuns, Settings } from '../types/game'
 import { ACHIEVEMENTS } from '../game/achievements'
 import { Sheet } from './ui'
@@ -13,6 +14,8 @@ type Props = {
   inRun: boolean
   onNewGame: () => void
   onResetAll: () => void
+  tab: 'settings' | 'achievements'
+  onTab: (t: 'settings' | 'achievements') => void
 }
 
 function Toggle({ label, hint, on, onChange }: { label: string; hint: string; on: boolean; onChange: (v: boolean) => void }) {
@@ -29,9 +32,8 @@ function Toggle({ label, hint, on, onChange }: { label: string; hint: string; on
   )
 }
 
-export function SettingsSheet({ open, onClose, settings, onChange, best, unlocked, inRun, onNewGame, onResetAll }: Props) {
+export function SettingsSheet({ open, onClose, settings, onChange, best, unlocked, inRun, onNewGame, onResetAll, tab, onTab: setTab }: Props) {
   const [confirm, setConfirm] = useState<'none' | 'new' | 'all'>('none')
-  const [tab, setTab] = useState<'settings' | 'achievements'>('settings')
   const got = ACHIEVEMENTS.filter((a) => unlocked.includes(a.id)).length
   return (
     <Sheet open={open} onClose={() => { setConfirm('none'); onClose() }} label="Settings" dim={false}>
@@ -94,7 +96,7 @@ export function SettingsSheet({ open, onClose, settings, onChange, best, unlocke
                     <p className="font-semibold text-[14px] uppercase tracking-[0.06em]">{a.name}</p>
                     <p className="text-[12px] text-muted">{a.description}</p>
                   </div>
-                  <span className={`mt-1 w-2.5 h-2.5 rounded-full shrink-0 ${on ? 'bg-lime ring-1 ring-ink' : 'bg-line'}`} aria-label={on ? 'Unlocked' : 'Locked'} />
+                  <span className={`mt-0.5 w-7 h-7 rounded-full shrink-0 flex items-center justify-center ${on ? '' : 'bg-line'}`} style={on ? { background: '#F5C542', boxShadow: '0 0 0 2px #fff, 0 0 0 3px #F5C542' } : undefined} aria-label={on ? 'Unlocked' : 'Locked'}>{on ? <Medal size={14} strokeWidth={2} color="#3B2A00" /> : null}</span>
                 </li>
               )
             })}

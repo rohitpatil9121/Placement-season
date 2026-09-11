@@ -1,35 +1,45 @@
 import { motion } from 'framer-motion'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, Flame } from 'lucide-react'
 import type { ActionId, GameState } from '../types/game'
 import { ACTIONS } from '../game/actions'
 import { ACTIONS_PER_DAY } from '../game/balance'
 import { canAct, previewAction } from '../game/engine'
 import { EffectList, Icon } from './ui'
-import { ACTION_COLOR } from './theme'
+import { ACTION_COLOR, GOLD } from './theme'
+import { FloatingDeltas } from './FloatingDeltas'
+import type { Effects, StreakKey } from '../types/game'
+import { STREAK_BONUS_AT } from '../game/balance'
 
-type Props = { state: GameState; onAct: (id: ActionId) => void; hint: boolean }
+type Props = { state: GameState; onAct: (id: ActionId) => void; hint: boolean; deltas: Effects; nonce: number; onPeek?: (e: Effects | null) => void }
+
+const STREAK_OF: Partial<Record<ActionId, StreakKey>> = { dsa: 'dsa', study: 'study', college: 'study', sleep: 'sleep' }
 
 export function ActionDots({ remaining }: { remaining: number }) {
   return (
     <span className="inline-flex items-center gap-1.5" aria-label={`${remaining} of ${ACTIONS_PER_DAY} actions remaining`}>
-      {Array.from({ length: ACTIONS_PER_DAY }, (_, i) => (
-        <motion.span
-          key={i}
-          className={`block w-2 h-2 rounded-full border border-ink ${i < remaining ? 'bg-ink' : 'bg-transparent'}`}
-          initial={false}
-          animate={{ scale: i < remaining ? 1 : 0.85, opacity: i < remaining ? 1 : 0.5 }}
-          transition={{ duration: 0.2 }}
-          aria-hidden
-        />
-      ))}
+      {Array.from({ length: ACTIONS_PER_DAY }, (_, i) => {
+        const on = i < remaining
+        return (
+          <motion.span
+            key={i}
+            className="block w-3.5 h-3.5 rounded-full border-2"
+            style={{ background: on ? GOLD : 'transparent', borderColor: on ? '#C99A12' : 'var(--color-line)', boxShadow: on ? 'inset 0 -2px 0 rgba(0,0,0,0.18)' : 'none' }}
+            initial={false}
+            animate={{ rotateY: on ? 0 : 180, scale: on ? 1 : 0.85 }}
+            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            aria-hidden
+          />
+        )
+      })}
     </span>
   )
 }
 
-export function ActionList({ state, onAct, hint }: Props) {
+export function ActionList({ state, onAct, hint, deltas, nonce, onPeek }: Props) {
   const remaining = state.actionsRemaining
   return (
-    <section aria-label="Today's actions">
+    <section aria-label="Today's actions" className="relative">
+      <FloatingDeltas deltas={deltas} nonce={nonce} />
       <div className="flex items-baseline justify-between">
         <div>
           <p className="eyebrow">Today</p>
@@ -55,6 +65,10 @@ export function ActionList({ state, onAct, hint }: Props) {
             <li key={a.id} className="border-b hairline">
               <motion.button
                 onClick={() => onAct(a.id)}
+                onMouseEnter={() => check.ok && onPeek?.(preview)}
+                onMouseLeave={() => onPeek?.(null)}
+                onFocus={() => check.ok && onPeek?.(preview)}
+                onBlur={() => onPeek?.(null)}
                 disabled={!check.ok}
                 aria-disabled={!check.ok}
                 className="group w-full text-left py-3.5 sm:py-4 px-2 -mx-2 rounded-[14px] flex items-start gap-4 press card-press disabled:opacity-40 hover:bg-surface/80"
@@ -70,6 +84,11 @@ export function ActionList({ state, onAct, hint }: Props) {
                     {i < 9 && <kbd className="hidden lg:inline text-[10px] text-faint border hairline rounded px-1 leading-4">{i + 1}</kbd>}
                     {a.maxPerDay && <span className="text-[11px] text-faint tnum">{used}/{a.maxPerDay}</span>}
                     {a.cost !== 1 && <span className="text-[11px] text-faint">{a.cost === 0 ? 'free' : `${a.cost} actions`}</span>}
+                    {STREAK_OF[a.id] && state.streaks[STREAK_OF[a.id]!] >= 2 && (
+                      <span className="inline-flex items-center gap-1 text-[11px] font-semibold rounded-full px-1.5 py-0.5 tnum" style={{ background: 'rgba(255,176,32,0.18)', color: '#9A5B00' }}>
+                        <Flame size={11} strokeWidth={2.2} fill={state.streaks[STREAK_OF[a.id]!] >= STREAK_BONUS_AT ? '#FFB020' : 'none'} /> {state.streaks[STREAK_OF[a.id]!]}-day streak
+                      </span>
+                    )}
                   </span>
                   <span className="block text-[13px] text-muted mt-0.5">{a.description}</span>
                   <span className="block mt-1.5">

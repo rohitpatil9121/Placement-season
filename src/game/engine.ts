@@ -1,13 +1,13 @@
 import type {
   ActionId, Application, Company, DaySummary, Effects, GameEvent, GameState, InterviewSession, LogEntry, Metrics,
-  ProgressKey, Rarity, StatKey, Stats,
+  ProgressKey, Rarity, StatKey, Stats, StreakKey, Streaks,
 } from '../types/game'
 import { ACTION_MAP } from './actions'
 import { EVENTS } from './events'
 import { COMPANIES, COMPANY_MAP, INTERVIEW_QUESTIONS } from './companies'
 import { ACHIEVEMENTS } from './achievements'
 import {
-  ACTIONS_PER_DAY, CORE_KEYS, INITIAL_STATS, RARITY_WEIGHTS, SAVE_VERSION, SKILL_KEYS, TOTAL_DAYS,
+  ACTIONS_PER_DAY, CORE_KEYS, INITIAL_STATS, RARITY_WEIGHTS, SAVE_VERSION, SKILL_KEYS, STREAK_BONUS_AT, TOTAL_DAYS,
   cgpaTier, getPhase, intensity, interviewPasses, oaPassChance, overnight, skillTier,
 } from './balance'
 import { Rng, randomSeed } from '../utils/random'
@@ -50,6 +50,7 @@ export function createGame(seed = randomSeed()): GameState {
     applications: [],
     daySummary: null,
     dayEventCount: 0,
+    streaks: { dsa: 0, study: 0, sleep: 0 },
     result: null,
     lastLogId: 1,
     startedAt: Date.now(),
@@ -462,6 +463,21 @@ export function endDay(state: GameState): GameState {
   if (state.status !== 'playing' || state.activeEvent || state.interview) return state
   const s = state.stats
   const recovery = overnight(s, !!state.usedToday.sleep, !!state.usedToday.dsa, !!(state.usedToday.study || state.usedToday.college))
+
+  // streaks: consecutive days of the same habit; a small bonus once a streak is established
+  const did: Record<StreakKey, boolean> = { dsa: !!state.usedToday.dsa, study: !!(state.usedToday.study || state.usedToday.college), sleep: !!state.usedToday.sleep }
+  const streaks: Streaks = { ...state.streaks }
+  const lostStreaks: StreakKey[] = []
+  for (const k of Object.keys(did) as StreakKey[]) {
+    if (did[k]) streaks[k] += 1
+    else {
+      if (streaks[k] >= STREAK_BONUS_AT) lostStreaks.push(k)
+      streaks[k] = 0
+    }
+  }
+  if (streaks.dsa >= STREAK_BONUS_AT) recovery.dsa = (recovery.dsa ?? 0) + 0.4
+  if (streaks.study >= STREAK_BONUS_AT) recovery.cgpa = (recovery.cgpa ?? 0) + 0.15
+  if (streaks.sleep >= STREAK_BONUS_AT) recovery.wellbeing = (recovery.wellbeing ?? 0) + 1
   const applied = applyEffects(s, recovery)
 
   const m: Metrics = { ...state.metrics }
@@ -476,16 +492,16 @@ export function endDay(state: GameState): GameState {
     const d = Math.round((applied.stats[k] - state.dayStartStats[k]) * 100) / 100
     if (d !== 0) deltas[k] = d
   }
-  const summary: DaySummary = { day: state.day, deltas, events: state.dayEventCount }
+  const summary: DaySummary = { day: state.day, deltas, events: state.dayEventCount, lostStreaks }
   const nextDay = state.day + 1
 
   if (nextDay >= TOTAL_DAYS) {
     const result = buildResult(applied.stats, m.careerBonus, state.applications, state.seed)
-    let next: GameState = { ...state, stats: applied.stats, metrics: m, day: TOTAL_DAYS, status: 'finished', result, daySummary: summary }
+    let next: GameState = { ...state, stats: applied.stats, metrics: m, day: TOTAL_DAYS, status: 'finished', result, daySummary: summary, streaks }
     next = log(next, { time: '09:00', text: 'Placement day.', kind: 'system' })
     return next
   }
-  return { ...state, stats: applied.stats, metrics: m, status: 'dayEnd', daySummary: summary }
+  return { ...state, stats: applied.stats, metrics: m, status: 'dayEnd', daySummary: summary, streaks }
 }
 
 /** Start the next day after the transition screen. */
@@ -571,5 +587,7 @@ export function sanitize(state: GameState): GameState {
     actionsRemaining: clamp(state.actionsRemaining, 0, ACTIONS_PER_DAY),
     day: clamp(state.day, 1, TOTAL_DAYS),
     dayEventCount: state.dayEventCount ?? 0,
+    streaks: { ...{ dsa: 0, study: 0, sleep: 0 }, ...(state.streaks ?? {}) },
+    version: SAVE_VERSION,
   }
 }

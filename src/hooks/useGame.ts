@@ -27,6 +27,8 @@ export function useGame(play: (k: SoundKind) => void) {
   const [lastDeltas, setLastDeltas] = useState<Effects>({})
   const [lastLine, setLastLine] = useState<string>('')
   const [shake, setShake] = useState(0)
+  const [nonce, setNonce] = useState(0)
+  const [unseenAchievements, setUnseenAchievements] = useState(0)
   const [savedAt, setSavedAt] = useState<number | null>(null)
   const [best, setBest] = useState<BestRuns>(() => loadBest())
   const [globalAchievements, setGlobalAchievements] = useState<string[]>(() => loadGlobalAchievements())
@@ -87,6 +89,7 @@ export function useGame(play: (k: SoundKind) => void) {
           saveGlobalAchievements(merged)
           return merged
         })
+        setUnseenAchievements((n) => n + unlocked.length)
       }
       setState(s)
       return s
@@ -126,8 +129,9 @@ export function useGame(play: (k: SoundKind) => void) {
       commit(r.state)
       setLastDeltas(r.deltas)
       setLastLine(r.line)
-      play('tick')
-      if (r.state.activeEvent) window.setTimeout(() => play('event'), 220)
+      setNonce((n) => n + 1)
+      play('coin')
+      if (r.state.activeEvent) window.setTimeout(() => play(r.state.activeEvent?.rarity === 'legendary' ? 'chime' : 'event'), 220)
     },
     [commit, notify, play, state],
   )
@@ -140,8 +144,9 @@ export function useGame(play: (k: SoundKind) => void) {
       commit(r.state)
       setLastDeltas(r.deltas)
       setLastLine(r.line)
+      setNonce((n) => n + 1)
       const net = Object.values(r.deltas).reduce((a, b) => a + (b ?? 0), 0)
-      if (net < -6 && ev.rarity !== 'common') setShake((n) => n + 1)
+      if (ev.tags?.includes('breakdown') || ev.tags?.includes('rejection') || (net < -6 && ev.rarity !== 'common')) setShake((n) => n + 1)
       play(net < 0 ? 'bad' : 'done')
     },
     [commit, play, state],
@@ -155,7 +160,7 @@ export function useGame(play: (k: SoundKind) => void) {
     setLastDeltas({})
     if (next.status === 'finished') {
       setView('result')
-      play('result')
+      play('placed')
     } else play('done')
   }, [commit, play, state])
 
@@ -165,7 +170,7 @@ export function useGame(play: (k: SoundKind) => void) {
     commit(next)
     setLastDeltas({})
     setLastLine('')
-    play('tick')
+    play(getPhase(next.day).from === next.day ? 'phase' : 'tick')
     if (next.activeEvent) window.setTimeout(() => play('event'), 300)
     if (next.interview) window.setTimeout(() => play('event'), 300)
   }, [commit, play, state])
@@ -195,8 +200,8 @@ export function useGame(play: (k: SoundKind) => void) {
       if (!state?.interview) return
       const next = answerInterview(state, i)
       commit(next)
-      if (next.interview?.outcome === 'offer') play('big')
-      else if (next.interview?.outcome === 'rejected') play('bad')
+      if (next.interview?.outcome === 'offer') play('offer')
+      else if (next.interview?.outcome === 'rejected') { play('thud'); setShake((n) => n + 1) }
       else play('tick')
     },
     [commit, play, state],
@@ -233,6 +238,8 @@ export function useGame(play: (k: SoundKind) => void) {
     })
   }, [])
 
+  const markAchievementsSeen = useCallback(() => setUnseenAchievements(0), [])
+
   const resetRun = useCallback(() => {
     clearSave()
     setState(null)
@@ -251,9 +258,9 @@ export function useGame(play: (k: SoundKind) => void) {
   }, [notify])
 
   return {
-    state, settings, view, notices, lastDeltas, lastLine, shake, savedAt, best, globalAchievements, corrupted,
+    state, settings, view, notices, lastDeltas, lastLine, shake, nonce, savedAt, best, globalAchievements, corrupted, unseenAchievements,
     startNew, continueGame, home, act, resolveEvent, finishDay, beginDay, apply, ignore, answer, endInterview,
-    setSettings, resetRun, resetAll, dismiss, notify, setView,
+    setSettings, resetRun, resetAll, dismiss, notify, setView, markAchievementsSeen,
   }
 }
 

@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { useEffect, useState } from 'react'
 import type { Effects, GameState, StatKey } from '../types/game'
 import { CORE_KEYS, PROGRESS_KEYS, STAT_LABEL } from '../game/balance'
 import { toCgpa } from '../game/scoring'
@@ -6,8 +7,12 @@ import { Num, fmtDelta } from './ui'
 import { STAT_COLOR } from './theme'
 import { StatIcon } from './StatIcon'
 
-function Row({ k, value, delta }: { k: StatKey; value: number; delta?: number }) {
+function Row({ k, value, delta, peek }: { k: StatKey; value: number; delta?: number; peek?: number }) {
   const isCgpa = k === 'cgpa'
+  const [flash, setFlash] = useState(0)
+  useEffect(() => {
+    if (delta !== undefined && Math.abs(delta) >= 0.05) setFlash((n) => n + 1)
+  }, [delta, value])
   const shown = isCgpa ? toCgpa(value) : value
   const low = !isCgpa && value < 20
   const color = STAT_COLOR[k]
@@ -31,21 +36,26 @@ function Row({ k, value, delta }: { k: StatKey; value: number; delta?: number })
           <Num value={shown} decimals={isCgpa ? 1 : 0} className="font-semibold text-[15px]" />
         </span>
       </div>
-      <div className="mt-1.5 h-[5px] bg-line rounded-full overflow-hidden" aria-hidden>
-        <motion.div className="h-full rounded-full" style={{ background: color }} initial={false} animate={{ width: `${Math.max(2, value)}%` }} transition={{ type: 'spring', stiffness: 170, damping: 22 }} />
+      <div key={flash} className={`mt-1.5 h-[5px] bg-line rounded-full overflow-hidden relative ${flash && delta && delta < 0 ? 'barshake' : ''}`} aria-hidden>
+        {peek !== undefined && peek !== 0 && (
+          <div className="absolute inset-y-0 rounded-full opacity-45" style={{ background: peek > 0 ? color : '#D95C5C', left: `${Math.min(value, Math.max(0, value + peek))}%`, width: `${Math.min(100, Math.abs(peek))}%` }} />
+        )}
+        <motion.div className="h-full rounded-full relative" style={{ background: color }} initial={false} animate={{ width: `${Math.max(2, value)}%` }} transition={{ type: 'spring', stiffness: 170, damping: 22 }}>
+          {flash > 0 && <span className="absolute inset-0 rounded-full bg-white flash" />}
+        </motion.div>
       </div>
     </li>
   )
 }
 
-export function StatePanel({ state, deltas }: { state: GameState; deltas: Effects }) {
+export function StatePanel({ state, deltas, peek }: { state: GameState; deltas: Effects; peek?: Effects | null }) {
   const career = PROGRESS_KEYS.filter((k) => state.revealed.includes(k as never))
   return (
     <section aria-label="Your state">
       <p className="eyebrow">Your state</p>
       <ul className="mt-2">
         {CORE_KEYS.map((k) => (
-          <Row key={k} k={k} value={state.stats[k]} delta={deltas[k]} />
+          <Row key={k} k={k} value={state.stats[k]} delta={deltas[k]} peek={peek?.[k]} />
         ))}
       </ul>
       {career.length > 0 && (
@@ -53,7 +63,7 @@ export function StatePanel({ state, deltas }: { state: GameState; deltas: Effect
           <p className="eyebrow mt-6">Career</p>
           <ul className="mt-2">
             {career.map((k) => (
-              <Row key={k} k={k} value={state.stats[k]} delta={deltas[k]} />
+              <Row key={k} k={k} value={state.stats[k]} delta={deltas[k]} peek={peek?.[k]} />
             ))}
           </ul>
         </>

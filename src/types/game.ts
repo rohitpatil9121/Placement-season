@@ -150,7 +150,12 @@ export type DaySummary = {
   day: number
   deltas: Effects
   events: number
+  /** streak names that ended today */
+  lostStreaks: StreakKey[]
 }
+
+export type StreakKey = 'dsa' | 'study' | 'sleep'
+export type Streaks = Record<StreakKey, number>
 
 export type Settings = {
   sound: boolean
@@ -200,6 +205,7 @@ export type GameState = {
   applications: Application[]
   daySummary: DaySummary | null
   dayEventCount: number
+  streaks: Streaks
   result: PlacementResult | null
   lastLogId: number
   startedAt: number

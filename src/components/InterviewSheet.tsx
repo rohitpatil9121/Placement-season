@@ -2,16 +2,27 @@ import { motion } from 'framer-motion'
 import type { GameState } from '../types/game'
 import { COMPANY_MAP, QUESTION_MAP } from '../game/companies'
 import { Sheet } from './ui'
+import { Confetti } from './Confetti'
+import { GOLD, alpha } from './theme'
+import { Interviewer, Mascot } from './Mascot'
 
 export function InterviewSheet({ state, onAnswer, onClose }: { state: GameState; onAnswer: (i: number) => void; onClose: () => void }) {
   const iv = state.interview
   const c = iv ? COMPANY_MAP[iv.companyId] : null
   const q = iv && !iv.outcome ? QUESTION_MAP[iv.questionIds[iv.index]] : null
+  const lastScore = iv ? (iv.index === 0 && !iv.outcome ? null : iv.score) : null
+  const reaction: 'neutral' | 'impressed' | 'bored' | 'concerned' = !iv || iv.lastReply === null ? 'neutral' : /impressed|Correct|nod|appreciate|genuine|surprised/i.test(iv.lastReply) ? 'impressed' : /pause|eleven|writes|Disqualifying|Fatal|nobody believes/i.test(iv.lastReply) ? 'concerned' : /checks the time|Forgettable|Neutral|slide/i.test(iv.lastReply) ? 'bored' : 'neutral'
+  void lastScore
   return (
-    <Sheet open={!!iv} dim label={c ? `Interview at ${c.name}` : 'Interview'} width="max-w-xl">
+    <>
+    <Confetti trigger={iv?.outcome === 'offer' ? 1 : 0} amount={1} colors={[GOLD, '#FFD97A', '#FFF1C2', '#F59E0B']} origin="center" />
+    <Sheet open={!!iv} dim label={c ? `Interview at ${c.name}` : 'Interview'} width="max-w-xl" accent={GOLD} wash={alpha(GOLD, 0.25)}>
       {iv && c && (
         <div className="p-7 sm:p-10">
-          <p className="eyebrow">Interview · {c.name} · {c.role}</p>
+          <div className="flex items-start justify-between gap-4">
+            <p className="eyebrow">Interview · {c.name} · {c.role}</p>
+            {!iv.outcome && <Interviewer reaction={reaction} size={72} />}
+          </div>
           {q ? (
               <motion.div key={q.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}>
                 {iv.lastReply && <p className="mt-4 text-[13px] text-muted italic">{iv.lastReply}</p>}
@@ -31,9 +42,12 @@ export function InterviewSheet({ state, onAnswer, onClose }: { state: GameState;
           ) : (
               <motion.div key="outcome" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}>
                 {iv.lastReply && <p className="mt-4 text-[13px] text-muted italic">{iv.lastReply}</p>}
-                <p className="serif text-[44px] sm:text-[56px] leading-none mt-6">
-                  {iv.outcome === 'offer' ? <>Offer<span className="mark px-1">.</span></> : 'Not this one.'}
-                </p>
+                <div className="flex items-end gap-4 mt-6">
+                  <p className="serif text-[44px] sm:text-[56px] leading-none">
+                    {iv.outcome === 'offer' ? <>Offer<span className="px-1" style={{ background: alpha(GOLD, 0.6) }}>.</span></> : 'Not this one.'}
+                  </p>
+                  <Mascot mood={iv.outcome === 'offer' ? 'celebrate' : 'worried'} size={84} />
+                </div>
                 <p className="mt-4 text-[16px] text-ink/85 max-w-prose">
                   {iv.outcome === 'offer'
                     ? `${c.name} wants you. ${c.role}, ₹${c.packageLpa} LPA. You read the mail three times. Then you send it to family.`
@@ -45,5 +59,6 @@ export function InterviewSheet({ state, onAnswer, onClose }: { state: GameState;
         </div>
       )}
     </Sheet>
+    </>
   )
 }

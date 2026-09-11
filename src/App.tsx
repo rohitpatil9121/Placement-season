@@ -17,6 +17,9 @@ export default function App() {
   const g = useGame(play)
   const { state, settings, view } = g
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [settingsTab, setSettingsTab] = useState<'settings' | 'achievements'>('settings')
+  const openTrophies = () => { setSettingsTab('achievements'); setSettingsOpen(true); g.markAchievementsSeen() }
+  const openSettings = () => { setSettingsTab('settings'); setSettingsOpen(true) }
 
   useEffect(() => setSoundOn(settings.sound), [settings.sound])
 
@@ -30,7 +33,7 @@ export default function App() {
   return (
     <MotionConfig reducedMotion={settings.reducedMotion ? 'always' : 'user'}>
       {view === 'start' && (
-        <StartScreen saved={state} best={g.best} corrupted={g.corrupted} onStart={g.startNew} onContinue={g.continueGame} onSettings={() => setSettingsOpen(true)} />
+        <StartScreen saved={state} best={g.best} corrupted={g.corrupted} onStart={g.startNew} onContinue={g.continueGame} onSettings={openSettings} />
       )}
 
       {view === 'game' && state && state.status === 'dayEnd' && state.daySummary && <DayTransition state={state} onStart={g.beginDay} />}
@@ -44,11 +47,16 @@ export default function App() {
             shake={g.shake}
             savedAt={g.savedAt}
             hint={state.day === 1 && !settings.seenFirstDayHint}
+            nonce={g.nonce}
+            unseen={g.unseenAchievements}
+            sound={settings.sound}
+            onToggleSound={() => g.setSettings({ sound: !settings.sound })}
+            onTrophies={openTrophies}
             onAct={g.act}
             onEndDay={g.finishDay}
             onApply={g.apply}
             onIgnore={g.ignore}
-            onSettings={() => setSettingsOpen(true)}
+            onSettings={openSettings}
             onHome={g.home}
           />
           <EventSheet state={state} onResolve={g.resolveEvent} />
@@ -63,6 +71,8 @@ export default function App() {
       <Notices items={g.notices} onDismiss={g.dismiss} />
       <SettingsSheet
         open={settingsOpen}
+        tab={settingsTab}
+        onTab={setSettingsTab}
         onClose={() => setSettingsOpen(false)}
         settings={settings}
         onChange={g.setSettings}

@@ -1,6 +1,9 @@
 import { motion } from 'framer-motion'
 import type { Effects, GameState, StatKey } from '../types/game'
 import { EffectList, Sheet } from './ui'
+import { Flash, Sparkles } from './Confetti'
+import { GOLD, STAT_COLOR, alpha } from './theme'
+import { useEffect, useState } from 'react'
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 const TIMES = ['9:40 AM', '11:42 AM', '1:15 PM', '4:20 PM', '7:05 PM', '11:58 PM']
@@ -17,18 +20,27 @@ export function EventSheet({ state, onResolve }: { state: GameState; onResolve: 
     }
   }
   const stamp = ev ? `${DAYS[(state.day + ev.id.length) % 7]} · ${TIMES[(state.day * 3 + state.actionsRemaining) % TIMES.length]}` : ''
+  const negative = ev?.tags?.includes('negative') || ev?.tags?.includes('rejection') || ev?.tags?.includes('breakdown')
+  const tone = ev?.rarity === 'legendary' ? GOLD : ev?.rarity === 'epic' ? STAT_COLOR.dsa : ev?.rarity === 'rare' ? (negative ? STAT_COLOR.wellbeing : STAT_COLOR.projects) : negative ? STAT_COLOR.wellbeing : STAT_COLOR.cgpa
+  const [legendaryTick, setLegendaryTick] = useState(0)
+  useEffect(() => {
+    if (ev?.rarity === 'legendary') setLegendaryTick((n) => n + 1)
+  }, [ev])
 
   return (
-    <Sheet open={!!ev} dim={true} label={ev?.title ?? 'Event'} width={big ? 'max-w-xl' : 'max-w-lg'}>
+    <>
+    <Flash trigger={ev?.rarity === 'legendary' ? legendaryTick : 0} color={alpha(GOLD, 0.55)} />
+    <Sparkles trigger={ev?.rarity === 'legendary' ? legendaryTick : 0} color={GOLD} />
+    <Sheet open={!!ev} dim={true} label={ev?.title ?? 'Event'} width={big ? 'max-w-xl' : 'max-w-lg'} wash={big ? alpha(tone, 0.35) : undefined} accent={tone}>
       {ev && (
         <div className="p-7 sm:p-10">
-          <p className="eyebrow">{stamp}</p>
+          <p className="eyebrow inline-flex items-center gap-2"><span className="w-2 h-2 rounded-full" style={{ background: tone }} aria-hidden />{stamp}</p>
           <motion.h2
             className={`serif mt-4 leading-[1.02] ${big ? 'text-[40px] sm:text-[52px]' : 'text-[32px] sm:text-[40px]'}`}
             initial={{ opacity: 0, y: big ? 12 : 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: big ? 0.5 : 0.3, delay: 0.05 }}
           >
             {ev.title}
-            {ev.rarity === 'legendary' && <span className="mark ml-1 px-1">.</span>}
+            {ev.rarity === 'legendary' && <span className="ml-1 px-1" style={{ background: alpha(GOLD, 0.6) }}>.</span>}
           </motion.h2>
           {ev.body && <p className="mt-5 text-[16px] leading-relaxed text-ink/85 max-w-prose">{ev.body}</p>}
           {ev.quote && <p className="serif mt-4 text-[22px] leading-snug text-ink">“{ev.quote}”</p>}
@@ -65,5 +77,6 @@ export function EventSheet({ state, onResolve }: { state: GameState; onResolve: 
         </div>
       )}
     </Sheet>
+    </>
   )
 }

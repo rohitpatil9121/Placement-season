@@ -39,8 +39,8 @@ export function EffectList({ effects, size = 'sm', className = '' }: { effects: 
 
 /** Overlay sheet with focus trap and Esc handling. Dims the game behind for important content. */
 export function Sheet({
-  open, children, onClose, dim = true, width = 'max-w-lg', label,
-}: { open: boolean; children: ReactNode; onClose?: () => void; dim?: boolean; width?: string; label: string }) {
+  open, children, onClose, dim = true, width = 'max-w-lg', label, wash, accent,
+}: { open: boolean; children: ReactNode; onClose?: () => void; dim?: boolean; width?: string; label: string; wash?: string; accent?: string }) {
   const ref = useRef<HTMLDivElement>(null)
   const reduced = useReducedMotion()
   useEffect(() => {
@@ -73,8 +73,8 @@ export function Sheet({
     if (!open) return null
     return (
       <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-6">
-        <button aria-label="Close" tabIndex={-1} className={`absolute inset-0 ${dim ? 'bg-ink/45' : 'bg-ink/10'}`} onClick={onClose} />
-        <div ref={ref} role="dialog" aria-modal="true" aria-label={label} className={`relative w-full ${width} bg-surface border hairline sm:rounded-[18px] rounded-t-[18px] max-h-[92dvh] overflow-y-auto`}>
+        <button aria-label="Close" tabIndex={-1} className={`absolute inset-0 ${dim ? 'bg-ink/45' : 'bg-ink/10'}`} style={wash ? { background: wash } : undefined} onClick={onClose} />
+        <div ref={ref} role="dialog" aria-modal="true" aria-label={label} className={`relative w-full ${width} bg-surface border hairline sm:rounded-[18px] rounded-t-[18px] max-h-[92dvh] overflow-y-auto`} style={accent ? { borderTop: `4px solid ${accent}` } : undefined}>
           {onClose && (
             <button onClick={onClose} aria-label="Close" className="absolute right-3 top-3 w-11 h-11 flex items-center justify-center rounded-md text-muted hover:text-ink hover:bg-paper">
               <X size={18} strokeWidth={1.75} />
@@ -96,14 +96,16 @@ export function Sheet({
           <motion.button
             aria-label="Close" tabIndex={-1}
             className={`absolute inset-0 ${dim ? 'bg-ink/45' : 'bg-ink/10'}`}
+            style={wash ? { background: wash } : undefined}
             onClick={onClose}
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
           />
           <motion.div
             ref={ref} role="dialog" aria-modal="true" aria-label={label}
             className={`relative w-full ${width} bg-surface border hairline sm:rounded-[18px] rounded-t-[18px] max-h-[92dvh] overflow-y-auto shadow-[0_24px_60px_-30px_rgba(23,23,23,0.35)]`}
-            initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 16 }}
-            transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+            style={accent ? { borderTop: `4px solid ${accent}` } : undefined}
+            initial={{ opacity: 0, y: wash ? 40 : 24, scale: wash ? 0.97 : 1 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 16 }}
+            transition={{ duration: wash ? 0.45 : 0.32, ease: [0.22, 1, 0.36, 1] }}
           >
             {onClose && (
               <button onClick={onClose} aria-label="Close" className="absolute right-3 top-3 w-11 h-11 flex items-center justify-center rounded-md text-muted hover:text-ink hover:bg-paper press">

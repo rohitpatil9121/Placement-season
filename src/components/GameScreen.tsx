@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { Settings2 } from 'lucide-react'
+import { Settings2, Trophy, Volume2, VolumeX } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import type { ActionId, Effects, GameState } from '../types/game'
 import { ACTIONS } from '../game/actions'
@@ -18,6 +18,11 @@ type Props = {
   shake: number
   savedAt: number | null
   hint: boolean
+  nonce: number
+  unseen: number
+  sound: boolean
+  onToggleSound: () => void
+  onTrophies: () => void
   onAct: (id: ActionId) => void
   onEndDay: () => void
   onApply: (id: string) => void
@@ -42,6 +47,7 @@ export function GameScreen(p: Props) {
   const { state } = p
   const phase = getPhase(state.day)
   const [shaking, setShaking] = useState(false)
+  const [peek, setPeek] = useState<Effects | null>(null)
   const blocked = !!state.activeEvent || !!state.interview
   const allUsed = state.actionsRemaining === 0
   const mood = moodFor(state.stats)
@@ -73,6 +79,12 @@ export function GameScreen(p: Props) {
         <button onClick={p.onHome} className="press text-[11px] sm:text-[12px] tracking-[0.16em] uppercase font-semibold whitespace-nowrap">Placement Season</button>
         <div className="flex items-center gap-4">
           <span className="hidden sm:inline"><SavedLabel at={p.savedAt} /></span>
+          <button onClick={p.onToggleSound} aria-label={p.sound ? 'Mute sound' : 'Unmute sound'} aria-pressed={p.sound} className="press w-11 h-11 flex items-center justify-center rounded-md text-muted hover:text-ink hover:bg-surface">
+            {p.sound ? <Volume2 size={18} strokeWidth={1.75} /> : <VolumeX size={18} strokeWidth={1.75} />}
+          </button>
+          <button onClick={p.onTrophies} aria-label={p.unseen ? `Achievements, ${p.unseen} new` : 'Achievements'} className={`press w-11 h-11 flex items-center justify-center rounded-full hover:bg-surface ${p.unseen ? 'pulse-ring' : 'text-muted hover:text-ink'}`} style={p.unseen ? { background: '#F5C542', color: '#3B2A00' } : undefined}>
+            <Trophy size={18} strokeWidth={1.75} />
+          </button>
           <button onClick={p.onSettings} aria-label="Settings" className="press w-11 h-11 -mr-2 flex items-center justify-center rounded-md text-muted hover:text-ink hover:bg-surface">
             <Settings2 size={18} strokeWidth={1.75} />
           </button>
@@ -90,7 +102,7 @@ export function GameScreen(p: Props) {
           </div>
 
           <div className="mt-10 lg:mt-12">
-            <ActionList state={state} onAct={p.onAct} hint={p.hint} />
+            <ActionList state={state} onAct={p.onAct} hint={p.hint} deltas={p.deltas} nonce={p.nonce} onPeek={setPeek} />
           </div>
 
           {p.line && (
@@ -108,7 +120,7 @@ export function GameScreen(p: Props) {
         </div>
 
         <aside className="space-y-10 lg:pt-3">
-          <StatePanel state={state} deltas={p.deltas} />
+          <StatePanel state={state} deltas={p.deltas} peek={peek} />
           <Opportunities state={state} onApply={p.onApply} onIgnore={p.onIgnore} />
           <Recent log={state.log} day={state.day} />
         </aside>
