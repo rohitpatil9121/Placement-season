@@ -81,7 +81,7 @@ export function Modal({ open, onClose, title, children, size = 'md', className =
             initial={{ opacity: 0, scale: 0.92, y: 24, filter: 'blur(8px)' }}
             animate={{ opacity: 1, scale: 1, y: 0, filter: 'blur(0px)' }}
             exit={{ opacity: 0, scale: 0.95, y: 12, filter: 'blur(6px)' }}
-            transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+            transition={{ type: 'spring', stiffness: 380, damping: 30, filter: { type: 'tween', duration: 0.2 }, opacity: { type: 'tween', duration: 0.2 } }}
           >
             {title && (
               <div className="flex items-center justify-between mb-4">
