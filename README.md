@@ -26,7 +26,8 @@ Ninety days, three actions a day, six things to balance, a company pipeline with
 3. Events interrupt. Some just happen; some ask what you do.
 4. From Day 20, companies start visiting campus. Apply if you clear the bar. Clear the assessment, sit the interview, get the offer or don't.
 5. End the day. See what changed. Start the next one.
-6. On Day 90, the season is scored and the verdict is revealed.
+6. Open the calendar (icon in the header) any time to look back at what you did on each day.
+7. On Day 90, the season is scored and the verdict is revealed.
 
 Keyboard: `1`–`9` triggers the actions in order, `E` ends the day, `Enter` starts the next day, `Esc` closes sheets.
 
@@ -73,6 +74,10 @@ scripts/sim.ts     headless balance simulation
 ```
 
 Every state transition is a pure function on `GameState`. Randomness comes from a seeded PRNG whose state is saved, so a run is reproducible from its seed.
+
+## Calendar
+
+The calendar icon in the header opens a 90-day grid laid out Monday to Sunday and tinted by season, with today outlined. Every finished day shows a coloured dot per action you ticked, and days with an on-campus offer carry a gold tag. Open a day to see the actions with their icons, what happened (events and company news), how each stat moved overnight, and the CGPA you ended on. Today shows what you have ticked so far. The engine stores one compact record per finished day (`history` in the save), so the calendar survives reloads and covers the whole season.
 
 ## Live data
 
