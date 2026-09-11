@@ -20,7 +20,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   { id: 'linkedin_survivor', name: 'LinkedIn Survivor', description: 'Survive five LinkedIn moments.', check: (s) => s.metrics.linkedinEvents >= 5 },
   { id: 'rejected_thrice', name: 'Thick Skin', description: 'Three rejections, still going.', check: (s) => s.metrics.rejections >= 3 },
   { id: 'campus_legend', name: 'Campus Legend', description: 'Finish with a score of 90 or more.', check: (s) => s.status === 'finished' && (s.result?.score ?? 0) >= 90 },
-  { id: 'dream', name: 'Dream Offer', description: 'Get an offer from a tier-three company.', check: (s) => s.applications.some((a) => a.stage === 'offer' && ['nexora', 'lumen', 'quanta'].includes(a.companyId)) },
+  { id: 'dream', name: 'Dream Offer', description: 'Get an offer from a tier-three company.', check: (s) => s.applications.some((a) => a.stage === 'offer' && ['flipkart', 'amazon', 'microsoft', 'google'].includes(a.companyId)) },
 ]
 
 export const ACHIEVEMENT_MAP: Record<string, Achievement> = Object.fromEntries(ACHIEVEMENTS.map((a) => [a.id, a]))

@@ -10,7 +10,7 @@ Ninety days, three actions a day, six things to balance, a company pipeline with
 - **Five core stats, progressively revealed career stats.** Energy, Sleep, DSA, CGPA and Wellbeing from Day 1. Projects, Resume, Interview, Networking and Applications appear only once you start working on them.
 - **Honest consequences.** Every action shows its effect before you commit. Diminishing returns make each skill harder to push the higher it gets, and neglected skills fade.
 - **Forty-plus events** with dry, observational writing. Some are interruptions, some are decisions with real tradeoffs. Rarity changes how an event feels, not a label on the screen.
-- **Companies with personalities.** Eight fictional employers with eligibility thresholds (CGPA, DSA, Projects, Resume), a discovered → applied → assessment → shortlisted → interview → result pipeline, and a short three-question interview that actually matters.
+- **Real campus recruiters.** Twelve real employers, from TCS and Infosys to Amazon, Microsoft and Google, with approximate publicly reported fresher packages and typical eligibility thresholds (CGPA, DSA, Projects), a discovered → applied → assessment → shortlisted → interview → result pipeline, and a short three-question interview that actually matters.
 - **A controlled random engine.** Strong networking raises referral odds, low wellbeing invites worse days, and an anti-frustration rule keeps a good run from being wrecked by luck while tossing struggling players an opportunity.
 - **Placement Day.** A nearly empty screen, a staged reveal of your numbers, then the verdict and a poster-style result card built for an Instagram story screenshot.
 - **Share.** Web Share on mobile, clipboard everywhere else. "Copied. Go humblebrag."
@@ -40,7 +40,7 @@ Keyboard: `1`–`9` triggers the actions in order, `E` ends the day, `Enter` sta
 
 **Companies.** Each has a role, package, tagline, eligibility, and an assessment type (DSA, projects or aptitude). Assessment pass chance is driven by the matching stats and luck; interview success is the sum of your three answers plus Interview skill, judged against the company's tier.
 
-**Scoring.** A hidden weighted blend of DSA, CGPA, Projects, Interview, Resume, Networking, Applications and Luck, nudged by Wellbeing and any offers held. An on-campus offer guarantees placement at that package; otherwise the score maps to one of seven outcomes from "Not placed" to "Campus legend" with a fictional off-campus employer.
+**Scoring.** A hidden weighted blend of DSA, CGPA, Projects, Interview, Resume, Networking, Applications and Luck, nudged by Wellbeing and any offers held. An on-campus offer guarantees placement at that package; otherwise the score maps to one of seven outcomes from "Not placed" to "Campus legend" with a fictional off-campus employer name.
 
 **Balance.** `npx tsx scripts/sim.ts` plays 40 seeded runs per strategy. A perfectly balanced bot scores about 88, chaotic random play about 77, single-focus specialists in the low 50s, and sleeping all season about 34. Every style finishes; none dominates.
 

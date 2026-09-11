@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import type { ApplicationStage, GameState } from '../types/game'
-import { COMPANY_MAP } from '../game/companies'
+import { COMPANIES, COMPANY_MAP } from '../game/companies'
 import { eligibilityGaps } from '../game/engine'
 import { GOLD, TIER_COLOR, alpha } from './theme'
 
@@ -33,13 +33,29 @@ function Pipeline({ stage, color }: { stage: ApplicationStage; color: string }) 
 
 export function Opportunities({ state, onApply, onIgnore }: { state: GameState; onApply: (id: string) => void; onIgnore: (id: string) => void }) {
   const apps = [...state.applications].filter((a) => a.stage !== 'rejected' || a.updatedDay >= state.day - 3).reverse()
+  const known = new Set(state.applications.map((a) => a.companyId))
+  const upcoming = COMPANIES.filter((c) => !known.has(c.id) && c.appearsTo >= state.day).sort((a, b) => a.appearsFrom - b.appearsFrom).slice(0, 5)
+  const disclaimer = <p className="mt-4 text-[11px] text-faint leading-relaxed">Real employers. Packages are approximate base pay from publicly reported fresher offers and change every year; roles and dates are simplified.</p>
   if (!apps.length) {
     return (
       <section aria-label="Companies" className="panel p-5">
         <p className="eyebrow eyebrow-dot">Companies</p>
         <p className="mt-3 text-[13px] text-muted leading-relaxed">
-          {state.day < 20 ? 'Nobody is hiring yet. Enjoy it.' : "You haven't applied anywhere. Bold strategy."}
+          {state.day < 20 ? 'Nobody is hiring yet. Here is who usually turns up.' : "You haven't applied anywhere. Bold strategy. Still to come:"}
         </p>
+        <ul className="mt-3 divide-y hairline">
+          {upcoming.map((c) => (
+            <li key={c.id} className="py-2 flex items-center gap-3">
+              <Mark name={c.name} color={TIER_COLOR[c.tier]} size={30} />
+              <span className="min-w-0 flex-1">
+                <span className="block text-[14px] font-semibold leading-tight">{c.name} <span className="text-muted font-normal">· ₹{c.packageLpa} LPA</span></span>
+                <span className="block text-[11px] text-faint">Needs {Object.entries(c.eligibility).map(([k, v]) => `${k === 'cgpa' ? 'CGPA' : k[0].toUpperCase() + k.slice(1)} ${k === 'cgpa' ? (v as number).toFixed(1) : v}+`).join(' · ')}</span>
+              </span>
+              <span className="text-[11px] tnum text-muted shrink-0">{c.appearsFrom <= state.day ? 'any day' : `Day ${c.appearsFrom}+`}</span>
+            </li>
+          ))}
+        </ul>
+        {disclaimer}
       </section>
     )
   }
@@ -100,6 +116,10 @@ export function Opportunities({ state, onApply, onIgnore }: { state: GameState; 
           )
         })}
       </ul>
+      {upcoming.length > 0 && (
+        <p className="mt-3 text-[12px] text-muted">Still to come: {upcoming.map((c) => c.name).join(', ')}.</p>
+      )}
+      {disclaimer}
     </section>
   )
 }
