@@ -44,21 +44,18 @@ export function GameHeader({ day, sound, onToggleSound, onSettings, onHome, onAc
       </div>
 
       <div className="flex items-center gap-0.5 sm:gap-1">
-        <AnimatePresence>
-          {savedTick > 0 && (
-            <motion.span
-              key={savedTick}
-              className="hidden sm:flex items-center gap-1 text-[11px] text-success mr-1"
-              initial={{ opacity: 0, x: 6 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              aria-live="polite"
-            >
-              <Check size={12} /> Saved
-            </motion.span>
-          )}
-        </AnimatePresence>
+        {savedTick > 0 && (
+          <motion.span
+            className="hidden sm:flex items-center gap-1 text-[11px] text-success mr-1"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0.4, 1, 1], scale: [0.95, 1.05, 1] }}
+            transition={{ duration: 0.5 }}
+            key={savedTick}
+            aria-live="polite"
+          >
+            <Check size={12} /> Game saved
+          </motion.span>
+        )}
         <button onClick={onAchievements} className={btn} aria-label="Achievements">
           <Trophy size={19} />
         </button>

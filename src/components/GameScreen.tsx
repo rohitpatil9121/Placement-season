@@ -91,7 +91,7 @@ export function GameScreen({ state, lastDeltas, shakeTick, reduced, onAction, on
                     key={a.id}
                     action={a}
                     disabled={!check.ok}
-                    reason={check.reason}
+                    reason={check.reason === 'Not enough actions left today.' ? undefined : check.reason}
                     usedToday={state.actionsUsedToday[a.id] ?? 0}
                     onClick={() => onAction(a.id)}
                   />

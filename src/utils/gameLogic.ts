@@ -127,10 +127,10 @@ const PROGRESS_KEYS: AllStatKey[] = ['dsa', 'projects', 'interview', 'resume', '
 /** Diminishing returns: the higher a skill, the harder it is to push further. */
 export function progressTier(value: number): number {
   if (value < 30) return 1
-  if (value < 50) return 0.65
-  if (value < 70) return 0.38
-  if (value < 85) return 0.18
-  return 0.08
+  if (value < 50) return 0.6
+  if (value < 70) return 0.35
+  if (value < 85) return 0.14
+  return 0.06
 }
 
 function cgpaTier(value: number): number {
@@ -461,8 +461,8 @@ export function endDay(state: GameState): EndDayResult {
   // overnight recovery — depends on sleep quality
   const sleepQ = s.sleep / 100
   const recovery: Effects = {
-    energy: Math.round(8 + 22 * sleepQ),
-    sleep: state.actionsUsedToday.deep_sleep ? 0 : Math.round(-6 + (s.sleep > 60 ? -2 : 0)),
+    energy: Math.round(5 + 16 * sleepQ),
+    sleep: state.actionsUsedToday.deep_sleep ? -3 : -8,
     wellbeing: s.sleep < 30 ? -4 : s.sleep > 70 ? 2 : 0,
     motivation: -1,
   }

@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion'
+import { motion } from 'framer-motion'
 import type { AllStatKey } from '../types/game'
 import { STAT_META } from '../utils/gameLogic'
 import { toCgpa } from '../utils/scoring'
@@ -66,21 +66,18 @@ export function StatCard({ statKey, value, delta }: Props) {
             </div>
           </div>
         </div>
-        <AnimatePresence>
-          {!!deltaDisplay && (
-            <motion.span
-              key={String(delta) + statKey}
-              className={`text-xs font-bold px-2 py-1 rounded-full ${deltaDisplay > 0 ? 'bg-success/15 text-success' : 'bg-danger/15 text-danger'}`}
-              initial={{ opacity: 0, y: 6, scale: 0.8 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0 }}
-              aria-live="polite"
-            >
-              {deltaDisplay > 0 ? '+' : ''}
-              {isCgpa ? deltaDisplay.toFixed(2) : Math.round(deltaDisplay * 10) / 10}
-            </motion.span>
-          )}
-        </AnimatePresence>
+        {!!deltaDisplay && (
+          <motion.span
+            key={String(delta) + statKey}
+            className={`text-xs font-bold px-2 py-1 rounded-full ${deltaDisplay > 0 ? 'bg-success/15 text-success' : 'bg-danger/15 text-danger'}`}
+            initial={{ opacity: 0, y: 6, scale: 0.8 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            aria-live="polite"
+          >
+            {deltaDisplay > 0 ? '+' : ''}
+            {isCgpa ? deltaDisplay.toFixed(2) : Math.round(deltaDisplay * 10) / 10}
+          </motion.span>
+        )}
       </div>
       <div className="mt-3">
         <StatBar value={value} color={color} label={meta.label} />
