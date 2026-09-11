@@ -17,7 +17,8 @@ const strategies: Record<string, Strategy> = {
     if (tired(s)) return 'sleep'
     if (sad(s)) return 'chill'
     const cycle: ActionId[] = ['dsa', 'project', 'study', 'dsa', 'mock', 'resume', 'apply', 'network', 'dsa', 'chill']
-    return cycle[(s.day * 3 + (3 - s.actionsRemaining)) % cycle.length]
+    const used = Object.values(s.usedToday).reduce((a, b) => a + (b ?? 0), 0)
+    return cycle[(s.day * 3 + used) % cycle.length]
   },
   'Sleep only': () => 'sleep',
   'Chaos': (s) => {
@@ -45,15 +46,13 @@ function run(strategy: Strategy, seed: number) {
     for (const a of s.applications) {
       if (a.stage === 'discovered' && !eligibilityGaps(COMPANY_MAP[a.companyId], s.stats).length) s = applyToCompany(s, a.companyId)
     }
-    if (s.actionsRemaining > 0) {
+    {
       let a = strategy(s)
-      if (!canAct(s, a).ok) a = canAct(s, 'sleep').ok ? 'sleep' : 'chill'
-      const r = performAction(s, a)
-      s = r.ok ? r.state : endDay(s)
-      s = unlockAchievements(s).state
-      continue
+      if (!canAct(s, a).ok) a = canAct(s, 'sleep').ok ? 'sleep' : canAct(s, 'chill').ok ? 'chill' : a
+      const r = canAct(s, a).ok ? performAction(s, a) : { ok: false, state: s }
+      if (r.ok) { s = unlockAchievements(r.state).state; continue }
+      s = endDay(s)
     }
-    s = endDay(s)
   }
   if (s.status !== 'finished') throw new Error('did not finish')
   return s

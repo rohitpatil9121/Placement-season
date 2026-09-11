@@ -1,7 +1,8 @@
 import type { Phase, Stats, StatKey } from '../types/game'
 
 export const TOTAL_DAYS = 90
-export const ACTIONS_PER_DAY = 3
+/** No daily cap: energy is the budget. Kept as a large number so the cost bookkeeping still works. */
+export const ACTIONS_PER_DAY = 99
 export const SAVE_VERSION = 5
 export const STREAK_BONUS_AT = 3
 
@@ -78,7 +79,7 @@ export const RARITY_WEIGHTS = { common: 55, uncommon: 25, rare: 12, epic: 6, leg
 export function overnight(stats: Stats, sleptToday: boolean, practicedDsa: boolean, studied: boolean) {
   const q = stats.sleep / 100
   const r: Partial<Record<StatKey, number>> = {
-    energy: Math.round(5 + 16 * q),
+    energy: Math.round(6 + 14 * q),
     sleep: sleptToday ? -3 : -8,
     wellbeing: stats.sleep < 30 ? -4 : stats.sleep > 70 ? 2 : 0,
     motivation: -1,

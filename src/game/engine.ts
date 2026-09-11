@@ -13,7 +13,7 @@ import {
 import { Rng, randomSeed } from '../utils/random'
 import { buildResult, clamp, fromCgpa } from './scoring'
 
-const TIMES = ['09:30', '12:30', '16:00', '19:30', '22:00', '23:50']
+const TIMES = ['08:30', '09:30', '10:30', '11:30', '12:30', '14:00', '15:00', '16:00', '17:00', '18:30', '19:30', '21:00', '22:00', '23:00', '23:50']
 
 /* ------------------------------------------------------------------ */
 /* State construction                                                  */
@@ -100,7 +100,7 @@ function reveal(state: GameState, keys?: ProgressKey[]): GameState {
 }
 
 const timeFor = (state: GameState, offset = 0) =>
-  TIMES[Math.min(TIMES.length - 1, ACTIONS_PER_DAY - state.actionsRemaining + offset)]
+  TIMES[Math.min(TIMES.length - 1, Object.values(state.usedToday).reduce((a, b) => a + (b ?? 0), 0) + offset)]
 
 /* ------------------------------------------------------------------ */
 /* Actions                                                             */
@@ -111,11 +111,10 @@ export function canAct(state: GameState, id: ActionId): { ok: boolean; reason?: 
   if (!action) return { ok: false, reason: 'Unknown action.' }
   if (state.status !== 'playing') return { ok: false }
   if (state.activeEvent || state.interview) return { ok: false }
-  if (action.cost > state.actionsRemaining) return { ok: false, reason: action.cost === 0 ? undefined : 'No actions left' }
   const used = state.usedToday[id] ?? 0
   if (action.maxPerDay !== undefined && used >= action.maxPerDay) return { ok: false, reason: 'Enough for today' }
-  const heavy: ActionId[] = ['dsa', 'study', 'project', 'mock', 'college']
-  if (state.stats.energy <= 0 && heavy.includes(id)) return { ok: false, reason: 'No energy' }
+  const energyCost = -(action.effects.energy ?? 0)
+  if (energyCost > 0 && state.stats.energy < energyCost) return { ok: false, reason: 'Not enough energy' }
   return { ok: true }
 }
 
@@ -584,7 +583,7 @@ export function sanitize(state: GameState): GameState {
     metrics: { ...initialMetrics(), ...state.metrics },
     revealed: Array.isArray(state.revealed) ? state.revealed : [],
     applications: Array.isArray(state.applications) ? state.applications : [],
-    actionsRemaining: clamp(state.actionsRemaining, 0, ACTIONS_PER_DAY),
+    actionsRemaining: ACTIONS_PER_DAY,
     day: clamp(state.day, 1, TOTAL_DAYS),
     dayEventCount: state.dayEventCount ?? 0,
     streaks: { ...{ dsa: 0, study: 0, sleep: 0 }, ...(state.streaks ?? {}) },

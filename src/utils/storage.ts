@@ -38,7 +38,7 @@ export function validate(raw: unknown): GameState | null {
   const s = raw as Partial<GameState>
   if (s.version !== SAVE_VERSION && s.version !== 4) return null
   if (!num(s.day) || s.day < 1 || s.day > 90) return null
-  if (!num(s.actionsRemaining) || s.actionsRemaining < 0 || s.actionsRemaining > 3) return null
+  if (!num(s.actionsRemaining) || s.actionsRemaining < 0) return null
   if (!s.stats || typeof s.stats !== 'object') return null
   for (const k of ['energy', 'sleep', 'dsa', 'cgpa', 'wellbeing']) {
     const v = (s.stats as Record<string, unknown>)[k]

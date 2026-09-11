@@ -94,7 +94,7 @@ export function StartScreen({ saved, best, corrupted, onStart, onContinue, onSet
 
       <footer className="border-t hairline bg-surface/60 backdrop-blur">
         <div className="max-w-5xl mx-auto px-6 sm:px-10 py-5 flex flex-wrap items-center justify-between gap-3 text-[12px] tracking-[0.12em] uppercase text-muted">
-          <span>90 days · 3 actions / day · many bad decisions</span>
+          <span>90 days · as much as your energy allows · many bad decisions</span>
           {best.runs > 0 && (
             <span className="tnum">
               Best {best.bestSalary > 0 ? `₹${best.bestSalary} LPA` : `score ${best.bestScore}`} · {best.runs} run{best.runs === 1 ? '' : 's'}

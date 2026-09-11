@@ -49,7 +49,7 @@ export function GameScreen(p: Props) {
   const [shaking, setShaking] = useState(false)
   const [peek, setPeek] = useState<Effects | null>(null)
   const blocked = !!state.activeEvent || !!state.interview
-  const allUsed = state.actionsRemaining === 0
+  const allUsed = state.stats.energy < 10
   const mood = moodFor(state.stats)
   const bump = state.metrics.eventsSeen + state.log.length
 
@@ -116,7 +116,7 @@ export function GameScreen(p: Props) {
 
           <div className="hidden lg:flex mt-8 items-center gap-4">
             <button onClick={p.onEndDay} disabled={blocked} className={`btn press ${allUsed ? 'btn-primary' : 'btn-ghost'}`}>
-              End day {!allUsed && <span className="text-muted font-normal">· skip the rest</span>}
+              End day
             </button>
             <kbd className="text-[11px] text-faint">E</kbd>
           </div>

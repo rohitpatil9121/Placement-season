@@ -36,19 +36,19 @@ export function ActionDots({ remaining }: { remaining: number }) {
 }
 
 export function ActionList({ state, onAct, hint, deltas, nonce, onPeek }: Props) {
-  const remaining = state.actionsRemaining
+  const ticked = Object.values(state.usedToday).reduce((a, b) => a + (b ?? 0), 0)
   return (
     <section aria-label="Today's actions" className="relative">
       <FloatingDeltas deltas={deltas} nonce={nonce} />
       <div className="flex items-baseline justify-between">
         <div>
           <p className="eyebrow eyebrow-dot">Today's list</p>
-          <p className="serif text-3xl sm:text-4xl mt-1">{remaining === 0 ? 'All ticked. End the day.' : remaining === ACTIONS_PER_DAY ? 'Pick three things.' : `${ACTIONS_PER_DAY - remaining} of ${ACTIONS_PER_DAY} ticked.`}</p>
+          <p className="serif text-3xl sm:text-4xl mt-1">{ticked === 0 ? 'What are you doing today?' : state.stats.energy < 10 ? 'Out of energy. End the day.' : `${ticked} ticked. Keep going or end the day.`}</p>
         </div>
       </div>
       {hint && (
         <p className="mt-3 text-[13px] text-muted">
-          <span className="mark px-1 text-ink font-medium">Tick three things today.</span> Each one changes your state. Then end the day.
+          <span className="mark px-1 text-ink font-medium">Do as much as your energy allows.</span> Each thing costs energy and changes your state. End the day whenever you like.
         </p>
       )}
 
@@ -94,7 +94,6 @@ export function ActionList({ state, onAct, hint, deltas, nonce, onPeek }: Props)
                     {done && <span className="text-[11px] font-bold tnum rounded-full px-1.5 py-0.5 text-white" style={{ background: color }}>done{used > 1 ? ` ×${used}` : ''}</span>}
                     {i < 9 && <kbd className="hidden lg:inline text-[10px] text-faint border hairline rounded px-1 leading-4">{i + 1}</kbd>}
                     {a.maxPerDay && <span className="text-[11px] text-faint tnum">{used}/{a.maxPerDay}</span>}
-                    {a.cost !== 1 && <span className="text-[11px] text-faint">{a.cost === 0 ? 'free' : `${a.cost} actions`}</span>}
                     {STREAK_OF[a.id] && state.streaks[STREAK_OF[a.id]!] >= 2 && (
                       <span className="inline-flex items-center gap-1 text-[11px] font-semibold rounded-full px-1.5 py-0.5 tnum" style={{ background: 'rgba(255,176,32,0.18)', color: '#9A5B00' }}>
                         <Flame size={11} strokeWidth={2.2} fill={state.streaks[STREAK_OF[a.id]!] >= STREAK_BONUS_AT ? '#FFB020' : 'none'} /> {state.streaks[STREAK_OF[a.id]!]}-day streak
@@ -104,7 +103,7 @@ export function ActionList({ state, onAct, hint, deltas, nonce, onPeek }: Props)
                   <span className="block text-[13px] text-muted mt-0.5 leading-snug truncate">{a.description}</span>
                 </span>
                 <span className="hidden sm:block text-right shrink-0">
-                  {check.ok || !check.reason ? <EffectList effects={preview} /> : check.reason === 'No actions left' ? null : <span className="text-[12px] text-warn font-medium">{check.reason}</span>}
+                  {check.ok || !check.reason ? <EffectList effects={preview} /> : <span className="text-[12px] text-warn font-medium">{check.reason}</span>}
                 </span>
                 
                 <span className="opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity shrink-0" style={{ color }} aria-hidden>
@@ -112,7 +111,7 @@ export function ActionList({ state, onAct, hint, deltas, nonce, onPeek }: Props)
                 </span>
               </motion.button>
               <div className="sm:hidden px-3.5 pt-1.5">
-                {check.ok || !check.reason ? <EffectList effects={preview} /> : check.reason === 'No actions left' ? null : <span className="text-[12px] text-warn font-medium">{check.reason}</span>}
+                {check.ok || !check.reason ? <EffectList effects={preview} /> : <span className="text-[12px] text-warn font-medium">{check.reason}</span>}
               </div>
             </li>
           )
