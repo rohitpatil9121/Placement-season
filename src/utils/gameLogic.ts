@@ -122,17 +122,37 @@ export function createInitialState(seed = randomSeed()): GameState {
 /* Effects                                                             */
 /* ------------------------------------------------------------------ */
 
+const PROGRESS_KEYS: AllStatKey[] = ['dsa', 'projects', 'interview', 'resume', 'networking']
+
+/** Diminishing returns: the higher a skill, the harder it is to push further. */
+export function progressTier(value: number): number {
+  if (value < 30) return 1
+  if (value < 50) return 0.65
+  if (value < 70) return 0.38
+  if (value < 85) return 0.18
+  return 0.08
+}
+
+function cgpaTier(value: number): number {
+  if (value < 70) return 1
+  if (value < 85) return 0.5
+  return 0.25
+}
+
 /** Apply effects with clamping. Returns the new stats and the *actual* deltas. */
 export function applyEffects(stats: GameStats, effects: Effects, bonus: number): { stats: GameStats; deltas: Effects } {
   const next: GameStats = { ...stats }
   const deltas: Effects = {}
-  for (const [k, v] of Object.entries(effects) as [AllStatKey, number][]) {
-    if (!v) continue
+  for (const [k, v0] of Object.entries(effects) as [AllStatKey, number][]) {
+    if (!v0) continue
     if (k === 'career') {
       // direct career effects are stored as a bonus that feeds the computed score
       continue
     }
     const before = next[k]
+    let v = v0
+    if (v > 0 && PROGRESS_KEYS.includes(k)) v = Math.max(0.2, Math.round(v * progressTier(before) * 10) / 10)
+    if (v > 0 && k === 'cgpa') v = Math.max(0.2, Math.round(v * cgpaTier(before) * 10) / 10)
     next[k] = clamp(before + v)
     const d = Math.round((next[k] - before) * 100) / 100
     if (d !== 0) deltas[k] = d
@@ -195,8 +215,7 @@ export function resolveActionEffects(state: GameState, actionId: ActionId, rng: 
   switch (actionId) {
     case 'grind_dsa': {
       const base = rng.int(4, 8)
-      const tier = s.dsa < 30 ? 1.15 : s.dsa < 60 ? 1 : s.dsa < 80 ? 0.65 : 0.4
-      e.dsa = Math.max(1, Math.round(base * tier * sleepMod * energyMod * moodMod * motMod * 10) / 10)
+      e.dsa = Math.max(1, Math.round(base * sleepMod * energyMod * moodMod * motMod * 10) / 10)
       e.wellbeing = rng.int(-4, -2)
       break
     }
@@ -314,7 +333,7 @@ export function performAction(state: GameState, actionId: ActionId): ActionResul
 
   // random event after an action (about half the phase's daily chance)
   const phase = getPhase(next.day)
-  let chance = phase.eventChance * 0.45
+  let chance = phase.eventChance * 0.22
   if (next.stats.energy <= 0) chance += 0.15
   if (next.stats.wellbeing < 25) chance += 0.1
   if (actionId !== 'coffee' && rng.chance(chance)) {
@@ -456,6 +475,10 @@ export function endDay(state: GameState): EndDayResult {
     recovery.energy = Math.round((recovery.energy ?? 0) * 0.4)
     recovery.cgpa = -0.5
   }
+  // knowledge fades when you skip practice ("how do I reverse a linked list again?")
+  if (!state.actionsUsedToday.grind_dsa && s.dsa > 30) recovery.dsa = (recovery.dsa ?? 0) - Math.round((0.3 + s.dsa / 100) * 10) / 10
+  // assignments pile up when you ignore academics entirely
+  if (!state.actionsUsedToday.study && !state.actionsUsedToday.college && s.cgpa > 30) recovery.cgpa = (recovery.cgpa ?? 0) - 0.35
   // low motivation slowly drags DSA memory
   if (s.motivation < 15) recovery.dsa = (recovery.dsa ?? 0) - 1
 
@@ -497,7 +520,7 @@ export function endDay(state: GameState): EndDayResult {
   }
 
   // morning event
-  let chance = phase.eventChance
+  let chance = phase.eventChance * 0.8
   if (stats.energy <= 5) chance += 0.15
   if (rng.chance(chance)) {
     const ev = rollEvent(next, rng)

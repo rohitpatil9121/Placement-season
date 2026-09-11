@@ -33,8 +33,8 @@ export function computePlacementScore(stats: GameStats, careerBonus: number): nu
     stats.applications * 0.05 +
     stats.luck * 0.05
   // Wellbeing nudges the result: burned-out candidates bomb interviews.
-  const wellbeingMod = (stats.wellbeing - 50) * 0.08
-  const offerMod = Math.min(10, careerBonus * 0.4)
+  const wellbeingMod = (stats.wellbeing - 50) * 0.06
+  const offerMod = Math.min(6, careerBonus * 0.3)
   return Math.round(clamp(base + wellbeingMod + offerMod))
 }
 
