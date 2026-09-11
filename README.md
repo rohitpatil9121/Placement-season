@@ -1,5 +1,7 @@
 # Placement Season
 
+**Play it now: https://rohitpatil9121.github.io/Placement-season/**
+
 A small, premium browser game about the last 90 days before campus placements at an Indian college. One decision at a time. How badly can this go?
 
 Ninety days, three actions a day, six things to balance, a company pipeline with real eligibility gates, short interactive interviews, and a placement-day reveal you will want to screenshot.
@@ -71,6 +73,12 @@ scripts/sim.ts     headless balance simulation
 ```
 
 Every state transition is a pure function on `GameState`. Randomness comes from a seeded PRNG whose state is saved, so a run is reproducible from its seed.
+
+## Live data
+
+On-campus companies load at runtime from [`public/data/companies.json`](public/data/companies.json) in this repo, fetched straight from GitHub with the bundled copy as a fallback. Edit that file and commit; every player sees the change on their next load, no rebuild needed. The Companies panel shows the `updatedAt` date and whether it came live from GitHub.
+
+Every push to `main` also rebuilds and redeploys the game to GitHub Pages through [`.github/workflows/pages.yml`](.github/workflows/pages.yml).
 
 ## Installation
 
