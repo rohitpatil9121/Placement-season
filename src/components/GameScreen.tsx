@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import type { ActionId, Effects, GameState } from '../types/game'
 import { ACTIONS } from '../game/actions'
 import { getPhase } from '../game/balance'
-import { ActionDots, ActionList } from './ActionList'
+import { ActionList } from './ActionList'
 import { DayHero } from './DayHero'
 import { Opportunities } from './Opportunities'
 import { Recent } from './Recent'
@@ -132,10 +132,7 @@ export function GameScreen(p: Props) {
       {/* mobile sticky bar */}
       <div className="lg:hidden fixed bottom-0 inset-x-0 z-30 bg-surface/85 backdrop-blur border-t hairline px-5 py-3 pb-[max(12px,env(safe-area-inset-bottom))]">
         <div className="flex items-center justify-between gap-4 max-w-3xl mx-auto">
-          <div>
-            <ActionDots remaining={state.actionsRemaining} />
-            <p className="text-[11px] text-muted mt-1 tnum">Day {state.day} · {state.actionsRemaining} left</p>
-          </div>
+          <p className="text-[13px] text-muted tnum font-medium">Day {state.day}</p>
           <button onClick={p.onEndDay} disabled={blocked} className={`btn press ${allUsed ? 'btn-primary' : 'btn-ghost'}`}>End day</button>
         </div>
       </div>

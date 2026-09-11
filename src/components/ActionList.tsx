@@ -45,10 +45,6 @@ export function ActionList({ state, onAct, hint, deltas, nonce, onPeek }: Props)
           <p className="eyebrow eyebrow-dot">Today's list</p>
           <p className="serif text-3xl sm:text-4xl mt-1">{remaining === 0 ? 'All ticked. End the day.' : remaining === ACTIONS_PER_DAY ? 'Pick three things.' : `${ACTIONS_PER_DAY - remaining} of ${ACTIONS_PER_DAY} ticked.`}</p>
         </div>
-        <div className="text-right">
-          <ActionDots remaining={remaining} />
-          <p className="text-[13px] text-muted mt-1.5 tnum font-medium">{remaining} left to tick</p>
-        </div>
       </div>
       {hint && (
         <p className="mt-3 text-[13px] text-muted">

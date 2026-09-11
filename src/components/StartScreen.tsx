@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { Brain, Coffee, GraduationCap, Heart, Moon, Zap } from 'lucide-react'
+import { Brain, Coffee, GraduationCap, Heart, Moon } from 'lucide-react'
 import type { BestRuns, GameState } from '../types/game'
 import { Mascot } from './Mascot'
 import { GOLD, STAT_COLOR } from './theme'
@@ -14,7 +14,6 @@ type Props = {
 }
 
 const CHIPS = [
-  { I: Zap, label: 'Energy', c: STAT_COLOR.energy, x: '6%', y: '18%', d: 0 },
   { I: Moon, label: 'Sleep', c: STAT_COLOR.sleep, x: '84%', y: '12%', d: 0.6 },
   { I: Brain, label: 'DSA', c: STAT_COLOR.dsa, x: '72%', y: '70%', d: 1.1 },
   { I: GraduationCap, label: 'CGPA', c: STAT_COLOR.cgpa, x: '12%', y: '74%', d: 0.3 },
