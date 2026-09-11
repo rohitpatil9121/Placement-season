@@ -21,11 +21,11 @@ export const GOLD = '#F5C542'
 export type PhaseTheme = { tint: string; tintDark: string; accent: string; ink: string }
 
 export const PHASE_THEME: Record<PhaseId, PhaseTheme> = {
-  prep: { tint: '#EAF6F0', tintDark: '#101A18', accent: '#2FBF9A', ink: '#0F5E4A' },
-  grind: { tint: '#FBF1E2', tintDark: '#1C1710', accent: '#F59E0B', ink: '#7A4B05' },
-  season: { tint: '#E7EEFF', tintDark: '#10142A', accent: '#3B82F6', ink: '#1E3A8A' },
-  final: { tint: '#FDE9EC', tintDark: '#231115', accent: '#F43F5E', ink: '#881337' },
-  day90: { tint: '#FBF3D6', tintDark: '#221C0E', accent: '#F5C542', ink: '#7A5A00' },
+  prep: { tint: '#D6F3E6', tintDark: '#101A18', accent: '#2FBF9A', ink: '#0F5E4A' },
+  grind: { tint: '#FDE9C8', tintDark: '#1C1710', accent: '#F59E0B', ink: '#7A4B05' },
+  season: { tint: '#D9E4FF', tintDark: '#10142A', accent: '#3B82F6', ink: '#1E3A8A' },
+  final: { tint: '#FFD9DF', tintDark: '#231115', accent: '#F43F5E', ink: '#881337' },
+  day90: { tint: '#FBEBB0', tintDark: '#221C0E', accent: '#F5C542', ink: '#7A5A00' },
 }
 
 /** Action → the stat colour used for its icon badge. */

@@ -29,10 +29,10 @@ function Row({ k, value, delta, peek }: { k: StatKey; value: number; delta?: num
   const low = !isCgpa && value < 20
   const color = STAT_COLOR[k]
   return (
-    <li className="py-2.5 border-b hairline last:border-b-0">
-      <div className="flex items-baseline justify-between gap-3">
-        <span className={`inline-flex items-center gap-2 text-[13px] ${low ? 'text-danger font-medium' : 'text-muted'}`}>
-          <StatIcon k={k} value={value} delta={delta} />
+    <li className="py-3">
+      <div className="flex items-center justify-between gap-3">
+        <span className={`inline-flex items-center gap-2.5 text-[13px] font-medium ${low ? 'text-danger' : 'text-ink'}`}>
+          <span className="pill-icon" style={{ background: `color-mix(in srgb, ${color} 18%, transparent)` }}><StatIcon k={k} value={value} delta={delta} size={15} /></span>
           {STAT_LABEL[k]}{low ? ' · low' : ''}
         </span>
         <span className="flex items-baseline gap-2">
@@ -45,14 +45,14 @@ function Row({ k, value, delta, peek }: { k: StatKey; value: number; delta?: num
               {fmtDelta(k, delta)}
             </motion.span>
           )}
-          <Num value={shown} decimals={isCgpa ? 1 : 0} className="font-semibold text-[15px]" />
+          <Num value={shown} decimals={isCgpa ? 1 : 0} className="serif text-[22px] leading-none" />
         </span>
       </div>
-      <div key={flash} className={`mt-1.5 h-[5px] bg-line rounded-full overflow-hidden relative ${flash && delta && delta < 0 ? 'barshake' : ''}`} aria-hidden>
+      <div key={flash} className={`mt-2 h-[9px] rounded-full overflow-hidden relative ${flash && delta && delta < 0 ? 'barshake' : ''}`} style={{ background: `color-mix(in srgb, ${color} 14%, var(--color-line))` }} aria-hidden>
         {peek !== undefined && peek !== 0 && (
           <div className="absolute inset-y-0 rounded-full opacity-45" style={{ background: peek > 0 ? color : '#D95C5C', left: `${Math.min(value, Math.max(0, value + peek))}%`, width: `${Math.min(100, Math.abs(peek))}%` }} />
         )}
-        <motion.div className="h-full rounded-full relative" style={{ background: color }} initial={false} animate={{ width: `${Math.max(2, value)}%` }} transition={{ type: 'spring', stiffness: 170, damping: 22 }}>
+        <motion.div className="h-full rounded-full relative" style={{ background: color, boxShadow: 'inset 0 -2px 0 rgba(0,0,0,0.15)' }} initial={false} animate={{ width: `${Math.max(2, value)}%` }} transition={{ type: 'spring', stiffness: 170, damping: 22 }}>
           {flash > 0 && <span className="absolute inset-0 rounded-full bg-white flash" />}
         </motion.div>
       </div>
@@ -63,8 +63,8 @@ function Row({ k, value, delta, peek }: { k: StatKey; value: number; delta?: num
 export function StatePanel({ state, deltas, peek }: { state: GameState; deltas: Effects; peek?: Effects | null }) {
   const career = PROGRESS_KEYS.filter((k) => state.revealed.includes(k as never))
   return (
-    <section aria-label="Your state">
-      <p className="eyebrow">Your state</p>
+    <section aria-label="Your state" className="panel p-5">
+      <p className="eyebrow eyebrow-dot">Your state</p>
       <p className="serif text-[20px] leading-tight mt-1" aria-live="polite">{vibeFor(state)}</p>
       <ul className="mt-3">
         {CORE_KEYS.map((k) => (

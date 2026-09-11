@@ -11,8 +11,10 @@ export function DayHero({ day, mood, bump }: { day: number; mood: Mood; bump: nu
   const left = TOTAL_DAYS - day
   const pct = ((day - 1) / (TOTAL_DAYS - 1)) * 100
   return (
-    <section aria-label={`Day ${day} of ${TOTAL_DAYS}`}>
-      <div className="flex items-end justify-between gap-6">
+    <section aria-label={`Day ${day} of ${TOTAL_DAYS}`} className="panel p-6 sm:p-8 relative overflow-hidden">
+      <div className="absolute -right-24 -top-24 w-72 h-72 rounded-full pointer-events-none" style={{ background: 'color-mix(in srgb, var(--phase-accent) 22%, transparent)' }} aria-hidden />
+      <div className="absolute -left-10 -bottom-16 w-48 h-48 rounded-full pointer-events-none" style={{ background: 'color-mix(in srgb, #FFB020 16%, transparent)' }} aria-hidden />
+      <div className="flex items-end justify-between gap-6 relative">
         <div>
           <p className="eyebrow">Day</p>
           <div className="flex items-baseline gap-3">
@@ -30,13 +32,15 @@ export function DayHero({ day, mood, bump }: { day: number; mood: Mood; bump: nu
         </div>
         <div className="hidden lg:block -mb-3"><Mascot mood={mood} bump={bump} size={120} /></div>
         <div className="text-right pb-2">
-          <p className="serif text-2xl sm:text-3xl tnum leading-none" style={{ color: 'var(--phase-ink)' }}>{left === 0 ? 'Today' : left}</p>
-          <p className="eyebrow mt-1.5">{left === 0 ? 'Placement day' : left === 1 ? 'day until placement' : 'days until placement'}</p>
+          <span className="inline-flex flex-col items-end rounded-2xl px-4 py-3 text-white" style={{ background: 'var(--phase-accent)', boxShadow: '0 12px 24px -14px var(--phase-accent)' }}>
+            <span className="serif text-3xl sm:text-4xl tnum leading-none">{left === 0 ? 'Today' : left}</span>
+            <span className="text-[10px] tracking-[0.14em] uppercase font-bold mt-1 opacity-90">{left === 0 ? 'Placement day' : left === 1 ? 'day left' : 'days left'}</span>
+          </span>
         </div>
       </div>
 
       {/* journey path */}
-      <div className="mt-10 relative" role="progressbar" aria-valuemin={1} aria-valuemax={TOTAL_DAYS} aria-valuenow={day} aria-label="Season progress">
+      <div className="mt-10 relative z-[1]" role="progressbar" aria-valuemin={1} aria-valuemax={TOTAL_DAYS} aria-valuenow={day} aria-label="Season progress">
         <div className="relative h-2 rounded-full overflow-hidden" style={{ background: 'var(--color-line)' }}>
           {PHASES.slice(0, 4).map((p) => (
             <span key={p.id} className="absolute top-0 bottom-0 opacity-30" style={{ left: `${((p.from - 1) / (TOTAL_DAYS - 1)) * 100}%`, width: `${((p.to - p.from + 1) / (TOTAL_DAYS - 1)) * 100}%`, background: PHASE_THEME[p.id].accent }} aria-hidden />

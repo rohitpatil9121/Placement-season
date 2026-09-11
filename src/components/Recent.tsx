@@ -8,8 +8,8 @@ const TONE: Record<LogEntry['kind'], string> = {
 export function Recent({ log, day }: { log: LogEntry[]; day: number }) {
   const items = log.filter((e) => e.day >= day - 1).slice(-8).reverse()
   return (
-    <section aria-label="Recently" aria-live="polite">
-      <p className="eyebrow">Recently</p>
+    <section aria-label="Recently" aria-live="polite" className="panel p-5">
+      <p className="eyebrow eyebrow-dot">Recently</p>
       {items.length <= 1 ? (
         <p className="mt-3 text-[13px] text-muted leading-relaxed">Nothing has happened yet. Give it five minutes.</p>
       ) : (

@@ -42,7 +42,7 @@ export function ActionList({ state, onAct, hint, deltas, nonce, onPeek }: Props)
       <FloatingDeltas deltas={deltas} nonce={nonce} />
       <div className="flex items-baseline justify-between">
         <div>
-          <p className="eyebrow">Today</p>
+          <p className="eyebrow eyebrow-dot">Today</p>
           <p className="serif text-2xl mt-1">{remaining === 0 ? 'Nothing left to do.' : remaining === ACTIONS_PER_DAY ? 'Pick your battles.' : 'Keep going.'}</p>
         </div>
         <div className="text-right">
@@ -56,13 +56,13 @@ export function ActionList({ state, onAct, hint, deltas, nonce, onPeek }: Props)
         </p>
       )}
 
-      <ul className="mt-5 border-t hairline">
+      <ul className="mt-5 grid sm:grid-cols-2 gap-3">
         {ACTIONS.map((a, i) => {
           const check = canAct(state, a.id)
           const preview = previewAction(state, a.id)
           const used = state.usedToday[a.id] ?? 0
           return (
-            <li key={a.id} className="border-b hairline">
+            <li key={a.id} style={{ ['--tile' as string]: ACTION_COLOR[a.id] }}>
               <motion.button
                 onClick={() => onAct(a.id)}
                 onMouseEnter={() => check.ok && onPeek?.(preview)}
@@ -71,12 +71,10 @@ export function ActionList({ state, onAct, hint, deltas, nonce, onPeek }: Props)
                 onBlur={() => onPeek?.(null)}
                 disabled={!check.ok}
                 aria-disabled={!check.ok}
-                className="group w-full text-left py-3.5 sm:py-4 px-2 -mx-2 rounded-[14px] flex items-start gap-4 press card-press disabled:opacity-40 hover:bg-surface/80"
-                whileHover={check.ok ? { x: 3 } : undefined}
-                transition={{ duration: 0.16 }}
+                className="tile group w-full h-full text-left p-3.5 flex items-start gap-3.5 disabled:opacity-45"
               >
-                <span className="badge" style={{ background: ACTION_COLOR[a.id] }} aria-hidden>
-                  <Icon name={a.icon} size={18} />
+                <span className="badge" style={{ background: ACTION_COLOR[a.id], width: 42, height: 42, borderRadius: 13 }} aria-hidden>
+                  <Icon name={a.icon} size={20} />
                 </span>
                 <span className="flex-1 min-w-0">
                   <span className="flex items-center gap-2">
@@ -95,8 +93,8 @@ export function ActionList({ state, onAct, hint, deltas, nonce, onPeek }: Props)
                     {check.ok || !check.reason ? <EffectList effects={preview} /> : <span className="text-[12px] text-warn font-medium">{check.reason}</span>}
                   </span>
                 </span>
-                <span className="mt-1 text-faint opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity" aria-hidden>
-                  <ArrowRight size={16} strokeWidth={1.75} />
+                <span className="mt-1 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity" style={{ color: ACTION_COLOR[a.id] }} aria-hidden>
+                  <ArrowRight size={16} strokeWidth={2} />
                 </span>
               </motion.button>
             </li>

@@ -76,9 +76,12 @@ export function GameScreen(p: Props) {
   return (
     <div className={`min-h-dvh ${shaking ? 'shake' : ''}`}>
       <header className="max-w-6xl mx-auto px-5 sm:px-8 pt-5 sm:pt-7 flex items-center justify-between">
-        <button onClick={p.onHome} className="press text-[11px] sm:text-[12px] tracking-[0.16em] uppercase font-semibold whitespace-nowrap">Placement Season</button>
-        <div className="flex items-center gap-4">
-          <span className="hidden sm:inline"><SavedLabel at={p.savedAt} /></span>
+        <button onClick={p.onHome} className="press inline-flex items-center gap-2.5 rounded-full pl-1.5 pr-4 py-1.5 bg-surface border hairline shadow-[0_8px_20px_-14px_rgba(0,0,0,0.4)] text-[11px] sm:text-[12px] tracking-[0.16em] uppercase font-bold whitespace-nowrap">
+          <span className="w-7 h-7 rounded-full" style={{ background: 'var(--phase-accent)' }} aria-hidden />
+          Placement Season
+        </button>
+        <div className="flex items-center gap-2 sm:gap-3 rounded-full bg-surface border hairline px-2 py-1 shadow-[0_8px_20px_-14px_rgba(0,0,0,0.4)]">
+          <span className="hidden sm:inline pl-2"><SavedLabel at={p.savedAt} /></span>
           <button onClick={p.onToggleSound} aria-label={p.sound ? 'Mute sound' : 'Unmute sound'} aria-pressed={p.sound} className="press w-11 h-11 flex items-center justify-center rounded-md text-muted hover:text-ink hover:bg-surface">
             {p.sound ? <Volume2 size={18} strokeWidth={1.75} /> : <VolumeX size={18} strokeWidth={1.75} />}
           </button>
@@ -91,17 +94,17 @@ export function GameScreen(p: Props) {
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-5 sm:px-8 pt-8 sm:pt-12 pb-28 lg:pb-16 grid lg:grid-cols-[1fr_300px] gap-12 lg:gap-16">
+      <main className="max-w-6xl mx-auto px-5 sm:px-8 pt-6 sm:pt-8 pb-28 lg:pb-16 grid lg:grid-cols-[1fr_320px] gap-6 lg:gap-8">
         <div className="min-w-0">
           <DayHero day={state.day} mood={mood} bump={bump} />
-          <p className="mt-4 text-[13px] text-muted">{phase.copy}</p>
+          <p className="mt-4 text-[14px] font-medium" style={{ color: 'var(--phase-ink)' }}>{phase.copy}</p>
 
-          <div className="lg:hidden mt-8 flex items-end gap-3">
+          <div className="lg:hidden mt-5 flex items-end gap-3 panel p-4">
             <Mascot mood={mood} bump={bump} size={64} className="shrink-0 -mb-1" />
             <div className="flex-1 min-w-0"><StateStrip state={state} /></div>
           </div>
 
-          <div className="mt-10 lg:mt-12">
+          <div className="mt-8 panel p-5 sm:p-6">
             <ActionList state={state} onAct={p.onAct} hint={p.hint} deltas={p.deltas} nonce={p.nonce} onPeek={setPeek} />
           </div>
 
@@ -119,7 +122,7 @@ export function GameScreen(p: Props) {
           </div>
         </div>
 
-        <aside className="space-y-10 lg:pt-3">
+        <aside className="space-y-5 lg:pt-3">
           <StatePanel state={state} deltas={p.deltas} peek={peek} />
           <Opportunities state={state} onApply={p.onApply} onIgnore={p.onIgnore} />
           <Recent log={state.log} day={state.day} />
@@ -127,7 +130,7 @@ export function GameScreen(p: Props) {
       </main>
 
       {/* mobile sticky bar */}
-      <div className="lg:hidden fixed bottom-0 inset-x-0 z-30 bg-paper/90 backdrop-blur border-t hairline px-5 py-3 pb-[max(12px,env(safe-area-inset-bottom))]">
+      <div className="lg:hidden fixed bottom-0 inset-x-0 z-30 bg-surface/85 backdrop-blur border-t hairline px-5 py-3 pb-[max(12px,env(safe-area-inset-bottom))]">
         <div className="flex items-center justify-between gap-4 max-w-3xl mx-auto">
           <div>
             <ActionDots remaining={state.actionsRemaining} />

@@ -35,8 +35,8 @@ export function Opportunities({ state, onApply, onIgnore }: { state: GameState; 
   const apps = [...state.applications].filter((a) => a.stage !== 'rejected' || a.updatedDay >= state.day - 3).reverse()
   if (!apps.length) {
     return (
-      <section aria-label="Companies">
-        <p className="eyebrow">Companies</p>
+      <section aria-label="Companies" className="panel p-5">
+        <p className="eyebrow eyebrow-dot">Companies</p>
         <p className="mt-3 text-[13px] text-muted leading-relaxed">
           {state.day < 20 ? 'Nobody is hiring yet. Enjoy it.' : "You haven't applied anywhere. Bold strategy."}
         </p>
@@ -44,8 +44,8 @@ export function Opportunities({ state, onApply, onIgnore }: { state: GameState; 
     )
   }
   return (
-    <section aria-label="Companies">
-      <p className="eyebrow">Companies</p>
+    <section aria-label="Companies" className="panel p-5">
+      <p className="eyebrow eyebrow-dot">Companies</p>
       <ul className="mt-3 space-y-3">
         {apps.map((a) => {
           const c = COMPANY_MAP[a.companyId]
