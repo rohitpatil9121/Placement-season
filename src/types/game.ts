@@ -154,6 +154,16 @@ export type DaySummary = {
   lostStreaks: StreakKey[]
 }
 
+/** Compact record of one finished day, for the calendar. */
+export type DayRecord = {
+  day: number
+  actions: Partial<Record<ActionId, number>>
+  deltas: Effects
+  events: string[]
+  offers: number
+  cgpaAfter: number
+}
+
 export type StreakKey = 'dsa' | 'study' | 'sleep'
 export type Streaks = Record<StreakKey, number>
 
@@ -207,6 +217,7 @@ export type GameState = {
   daySummary: DaySummary | null
   dayEventCount: number
   streaks: Streaks
+  history: DayRecord[]
   result: PlacementResult | null
   lastLogId: number
   startedAt: number

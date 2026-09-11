@@ -15,6 +15,7 @@ Ninety days, three actions a day, six things to balance, a company pipeline with
 - **Real campus recruiters.** Twelve real employers, from TCS and Infosys to Amazon, Microsoft and Google, with approximate publicly reported fresher packages and typical eligibility thresholds (CGPA, DSA, Projects), a discovered → applied → assessment → shortlisted → interview → result pipeline, and a short three-question interview that actually matters.
 - **A controlled random engine.** Strong networking raises referral odds, low wellbeing invites worse days, and an anti-frustration rule keeps a good run from being wrecked by luck while tossing struggling players an opportunity.
 - **Placement Day.** A nearly empty screen, a staged reveal of your numbers, then the verdict and a poster-style result card built for an Instagram story screenshot.
+- **A calendar.** A 90-day grid tinted by season; every past day shows coloured dots for what you ticked, and opening a day lists the actions, what happened, and how your stats moved by night.
 - **Share.** Web Share on mobile, clipboard everywhere else. "Copied. Go humblebrag."
 - **Twenty achievements**, local best-run records, auto-save after every change, a corrupted-save recovery path, keyboard shortcuts, reduced motion, and an optional muted-by-default sound layer.
 

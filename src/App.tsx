@@ -7,6 +7,7 @@ import { InterviewSheet } from './components/InterviewSheet'
 import { Notices } from './components/Notices'
 import { PlacementDay } from './components/PlacementDay'
 import { SettingsSheet } from './components/SettingsSheet'
+import { CalendarSheet } from './components/CalendarSheet'
 import { StartScreen } from './components/StartScreen'
 import { useGame } from './hooks/useGame'
 import { useSound } from './hooks/useSound'
@@ -20,6 +21,7 @@ export default function App() {
   const g = useGame(play)
   const { state, settings, view } = g
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [calendarOpen, setCalendarOpen] = useState(false)
   const [settingsTab, setSettingsTab] = useState<'settings' | 'achievements'>('settings')
   const openTrophies = () => { setSettingsTab('achievements'); setSettingsOpen(true); g.markAchievementsSeen() }
   const openSettings = () => { setSettingsTab('settings'); setSettingsOpen(true) }
@@ -58,6 +60,7 @@ export default function App() {
             sound={settings.sound || settings.music}
             onToggleSound={() => { const on = !(settings.sound || settings.music); g.setSettings({ sound: on, music: on }) }}
             onTrophies={openTrophies}
+            onCalendar={() => setCalendarOpen(true)}
             onAct={g.act}
             onEndDay={g.finishDay}
             onApply={g.apply}
@@ -75,6 +78,7 @@ export default function App() {
         <PlacementDay state={state} reduced={settings.reducedMotion} onPlayAgain={g.startNew} onHome={g.home} onNotify={g.notify} onBeat={(i) => play(i >= 4 ? 'chime' : 'pop')} />
       )}
 
+      {state && <CalendarSheet open={calendarOpen} onClose={() => setCalendarOpen(false)} state={state} />}
       <Notices items={g.notices} onDismiss={g.dismiss} />
       <SettingsSheet
         open={settingsOpen}

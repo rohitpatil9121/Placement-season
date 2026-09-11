@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { Settings2, Trophy, Volume2, VolumeX } from 'lucide-react'
+import { CalendarDays, Settings2, Trophy, Volume2, VolumeX } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import type { ActionId, Effects, GameState } from '../types/game'
 import { ACTIONS } from '../game/actions'
@@ -23,6 +23,7 @@ type Props = {
   sound: boolean
   onToggleSound: () => void
   onTrophies: () => void
+  onCalendar: () => void
   onAct: (id: ActionId) => void
   onEndDay: () => void
   onApply: (id: string) => void
@@ -85,6 +86,9 @@ export function GameScreen(p: Props) {
           <span className="hidden sm:inline pl-2"><SavedLabel at={p.savedAt} /></span>
           <button onClick={p.onToggleSound} aria-label={p.sound ? 'Mute sound' : 'Unmute sound'} aria-pressed={p.sound} className="press w-11 h-11 flex items-center justify-center rounded-md text-muted hover:text-ink hover:bg-surface">
             {p.sound ? <Volume2 size={18} strokeWidth={1.75} /> : <VolumeX size={18} strokeWidth={1.75} />}
+          </button>
+          <button onClick={p.onCalendar} aria-label="Calendar" className="press w-11 h-11 flex items-center justify-center rounded-md text-muted hover:text-ink hover:bg-surface">
+            <CalendarDays size={18} strokeWidth={1.75} />
           </button>
           <button onClick={p.onTrophies} aria-label={p.unseen ? `Achievements, ${p.unseen} new` : 'Achievements'} className={`press w-11 h-11 flex items-center justify-center rounded-full hover:bg-surface ${p.unseen ? 'pulse-ring' : 'text-muted hover:text-ink'}`} style={p.unseen ? { background: '#F5C542', color: '#3B2A00' } : undefined}>
             <Trophy size={18} strokeWidth={1.75} />

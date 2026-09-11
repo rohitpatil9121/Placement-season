@@ -1,6 +1,6 @@
 import type {
   ActionId, Application, Company, DaySummary, Effects, GameEvent, GameState, InterviewSession, LogEntry, Metrics,
-  ProgressKey, Rarity, StatKey, Stats, StreakKey, Streaks,
+  ProgressKey, Rarity, StatKey, Stats, StreakKey, Streaks, DayRecord,
 } from '../types/game'
 import { ACTION_MAP } from './actions'
 import { EVENTS } from './events'
@@ -51,6 +51,7 @@ export function createGame(seed = randomSeed()): GameState {
     daySummary: null,
     dayEventCount: 0,
     streaks: { dsa: 0, study: 0, sleep: 0 },
+    history: [],
     result: null,
     lastLogId: 1,
     startedAt: Date.now(),
@@ -490,15 +491,19 @@ export function endDay(state: GameState): GameState {
     if (d !== 0) deltas[k] = d
   }
   const summary: DaySummary = { day: state.day, deltas, events: state.dayEventCount, lostStreaks }
+  const dayEvents = state.log.filter((e) => e.day === state.day && (e.kind === 'event' || e.kind === 'company')).map((e) => e.text.split('. ')[0]).slice(0, 4)
+  const offersToday = state.log.filter((e) => e.day === state.day && e.kind === 'company' && /made an offer/.test(e.text)).length
+  const record: DayRecord = { day: state.day, actions: { ...state.usedToday }, deltas, events: dayEvents, offers: offersToday, cgpaAfter: applied.stats.cgpa }
+  const history = [...state.history, record]
   const nextDay = state.day + 1
 
   if (nextDay >= TOTAL_DAYS) {
     const result = buildResult(applied.stats, m.careerBonus, state.applications, state.seed)
-    let next: GameState = { ...state, stats: applied.stats, metrics: m, day: TOTAL_DAYS, status: 'finished', result, daySummary: summary, streaks }
+    let next: GameState = { ...state, stats: applied.stats, metrics: m, day: TOTAL_DAYS, status: 'finished', result, daySummary: summary, streaks, history }
     next = log(next, { time: '09:00', text: 'Placement day.', kind: 'system' })
     return next
   }
-  return { ...state, stats: applied.stats, metrics: m, status: 'dayEnd', daySummary: summary, streaks }
+  return { ...state, stats: applied.stats, metrics: m, status: 'dayEnd', daySummary: summary, streaks, history }
 }
 
 /** Start the next day after the transition screen. */
@@ -585,6 +590,7 @@ export function sanitize(state: GameState): GameState {
     day: clamp(state.day, 1, TOTAL_DAYS),
     dayEventCount: state.dayEventCount ?? 0,
     streaks: { ...{ dsa: 0, study: 0, sleep: 0 }, ...(state.streaks ?? {}) },
+    history: Array.isArray(state.history) ? state.history : [],
     version: SAVE_VERSION,
   }
 }
