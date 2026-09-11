@@ -27,7 +27,7 @@ export function EffectList({ effects, size = 'sm', className = '' }: { effects: 
   const entries = (Object.entries(effects) as [StatKey, number][]).filter(([, v]) => v && Math.abs(v) >= 0.05)
   if (!entries.length) return null
   return (
-    <span className={`inline-flex flex-wrap gap-x-3 gap-y-1 tnum ${size === 'sm' ? 'text-[12px]' : 'text-[14px]'} ${className}`}>
+    <span className={`inline-flex flex-wrap gap-x-3 gap-y-1 tnum ${size === 'sm' ? 'text-[13px]' : 'text-[15px]'} ${className}`}>
       {entries.map(([k, v]) => (
         <span key={k} className={v > 0 ? 'text-success' : 'text-danger'}>
           <span className="font-semibold">{fmtDelta(k, v)}</span> <span className="text-muted">{STAT_LABEL[k]}</span>

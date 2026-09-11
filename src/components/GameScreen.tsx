@@ -97,7 +97,7 @@ export function GameScreen(p: Props) {
       <main className="max-w-6xl mx-auto px-5 sm:px-8 pt-6 sm:pt-8 pb-28 lg:pb-16 grid lg:grid-cols-[1fr_320px] gap-6 lg:gap-8">
         <div className="min-w-0">
           <DayHero day={state.day} mood={mood} bump={bump} />
-          <p className="mt-4 text-[14px] font-medium" style={{ color: 'var(--phase-ink)' }}>{phase.copy}</p>
+          <p className="mt-4 serif text-[22px]" style={{ color: 'var(--phase-ink)' }}>{phase.copy}</p>
 
           <div className="lg:hidden mt-5 flex items-end gap-3 panel p-4">
             <Mascot mood={mood} bump={bump} size={64} className="shrink-0 -mb-1" />
@@ -109,7 +109,7 @@ export function GameScreen(p: Props) {
           </div>
 
           {p.line && (
-            <motion.p key={p.line} className="serif text-[20px] text-muted mt-6" initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} aria-live="polite">
+            <motion.p key={p.line} className="serif text-[24px] text-muted mt-6" initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} aria-live="polite">
               {p.line}
             </motion.p>
           )}

@@ -67,12 +67,12 @@ export function Opportunities({ state, onApply, onIgnore }: { state: GameState; 
                 <Mark name={c.name} color={offer ? GOLD : color} />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-start justify-between gap-2">
-                    <p className="font-semibold text-[15px] leading-tight">{c.name}</p>
+                    <p className="font-bold text-[17px] leading-tight">{c.name}</p>
                     <span className="text-[10px] tracking-[0.12em] uppercase font-bold shrink-0 rounded-full px-2 py-0.5" style={{ background: offer ? GOLD : dead ? 'var(--color-line)' : alpha(color, 0.15), color: offer ? '#3B2A00' : dead ? 'var(--color-muted)' : color }}>
                       {STAGE_LABEL[a.stage]}
                     </span>
                   </div>
-                  <p className="text-[12px] text-muted mt-0.5">{c.role} · <span className="font-semibold text-ink tnum">₹{c.packageLpa} LPA</span></p>
+                  <p className="text-[13px] text-muted mt-0.5">{c.role} · <span className="font-semibold text-ink tnum">₹{c.packageLpa} LPA</span></p>
                   {a.stage === 'discovered' ? (
                     <div className="mt-2">
                       <p className="text-[12px] text-muted italic">{c.tagline}</p>

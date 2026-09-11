@@ -43,11 +43,11 @@ export function ActionList({ state, onAct, hint, deltas, nonce, onPeek }: Props)
       <div className="flex items-baseline justify-between">
         <div>
           <p className="eyebrow eyebrow-dot">Today</p>
-          <p className="serif text-2xl mt-1">{remaining === 0 ? 'Nothing left to do.' : remaining === ACTIONS_PER_DAY ? 'Pick your battles.' : 'Keep going.'}</p>
+          <p className="serif text-3xl sm:text-4xl mt-1">{remaining === 0 ? 'Nothing left to do.' : remaining === ACTIONS_PER_DAY ? 'Pick your battles.' : 'Keep going.'}</p>
         </div>
         <div className="text-right">
           <ActionDots remaining={remaining} />
-          <p className="text-[12px] text-muted mt-1.5 tnum">{remaining} action{remaining === 1 ? '' : 's'} remaining</p>
+          <p className="text-[13px] text-muted mt-1.5 tnum font-medium">{remaining} action{remaining === 1 ? '' : 's'} remaining</p>
         </div>
       </div>
       {hint && (
@@ -71,14 +71,14 @@ export function ActionList({ state, onAct, hint, deltas, nonce, onPeek }: Props)
                 onBlur={() => onPeek?.(null)}
                 disabled={!check.ok}
                 aria-disabled={!check.ok}
-                className="tile group w-full h-full text-left p-3.5 flex items-start gap-3.5 disabled:opacity-45"
+                className="tile group w-full h-full text-left p-4 flex items-start gap-4 disabled:opacity-45"
               >
-                <span className="badge" style={{ background: ACTION_COLOR[a.id], width: 42, height: 42, borderRadius: 13 }} aria-hidden>
-                  <Icon name={a.icon} size={20} />
+                <span className="badge" style={{ background: ACTION_COLOR[a.id], width: 48, height: 48, borderRadius: 14 }} aria-hidden>
+                  <Icon name={a.icon} size={22} />
                 </span>
                 <span className="flex-1 min-w-0">
                   <span className="flex items-center gap-2">
-                    <span className="font-semibold text-[15px]">{a.name}</span>
+                    <span className="font-bold text-[17px] sm:text-[18px]">{a.name}</span>
                     {i < 9 && <kbd className="hidden lg:inline text-[10px] text-faint border hairline rounded px-1 leading-4">{i + 1}</kbd>}
                     {a.maxPerDay && <span className="text-[11px] text-faint tnum">{used}/{a.maxPerDay}</span>}
                     {a.cost !== 1 && <span className="text-[11px] text-faint">{a.cost === 0 ? 'free' : `${a.cost} actions`}</span>}
@@ -88,7 +88,7 @@ export function ActionList({ state, onAct, hint, deltas, nonce, onPeek }: Props)
                       </span>
                     )}
                   </span>
-                  <span className="block text-[13px] text-muted mt-0.5">{a.description}</span>
+                  <span className="block text-[14px] text-muted mt-1 leading-snug">{a.description}</span>
                   <span className="block mt-1.5">
                     {check.ok || !check.reason ? <EffectList effects={preview} /> : <span className="text-[12px] text-warn font-medium">{check.reason}</span>}
                   </span>

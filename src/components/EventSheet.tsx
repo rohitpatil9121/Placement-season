@@ -42,8 +42,8 @@ export function EventSheet({ state, onResolve }: { state: GameState; onResolve: 
             {ev.title}
             {ev.rarity === 'legendary' && <span className="ml-1 px-1" style={{ background: alpha(GOLD, 0.6) }}>.</span>}
           </motion.h2>
-          {ev.body && <p className="mt-5 text-[16px] leading-relaxed text-ink/85 max-w-prose">{ev.body}</p>}
-          {ev.quote && <p className="serif mt-4 text-[22px] leading-snug text-ink">“{ev.quote}”</p>}
+          {ev.body && <p className="mt-5 text-[18px] leading-relaxed text-ink/85 max-w-prose">{ev.body}</p>}
+          {ev.quote && <p className="serif mt-4 text-[26px] leading-snug text-ink">“{ev.quote}”</p>}
 
           {!ev.choices ? (
             <div className="mt-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-5">

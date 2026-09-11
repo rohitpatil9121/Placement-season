@@ -20,7 +20,7 @@ export function DayHero({ day, mood, bump }: { day: number; mood: Mood; bump: nu
           <div className="flex items-baseline gap-3">
             <motion.span
               key={day}
-              className="serif text-[88px] sm:text-[120px] leading-[0.85] tnum"
+              className="serif text-[104px] sm:text-[144px] leading-[0.85] tnum"
               style={{ color: 'var(--phase-ink)' }}
               initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
@@ -33,7 +33,7 @@ export function DayHero({ day, mood, bump }: { day: number; mood: Mood; bump: nu
         <div className="hidden lg:block -mb-3"><Mascot mood={mood} bump={bump} size={120} /></div>
         <div className="text-right pb-2">
           <span className="inline-flex flex-col items-end rounded-2xl px-4 py-3 text-white" style={{ background: 'var(--phase-accent)', boxShadow: '0 12px 24px -14px var(--phase-accent)' }}>
-            <span className="serif text-3xl sm:text-4xl tnum leading-none">{left === 0 ? 'Today' : left}</span>
+            <span className="serif text-4xl sm:text-5xl tnum leading-none">{left === 0 ? 'Today' : left}</span>
             <span className="text-[10px] tracking-[0.14em] uppercase font-bold mt-1 opacity-90">{left === 0 ? 'Placement day' : left === 1 ? 'day left' : 'days left'}</span>
           </span>
         </div>
@@ -67,7 +67,7 @@ export function DayHero({ day, mood, bump }: { day: number; mood: Mood; bump: nu
             <path d="M42 64 Q50 70 58 64" stroke="#2B2320" strokeWidth="2.4" fill="none" strokeLinecap="round" />
           </svg>
         </motion.span>
-        <div className="mt-4 hidden sm:grid grid-cols-4 text-[11px] tracking-[0.1em] uppercase">
+        <div className="mt-4 hidden sm:grid grid-cols-4 text-[12px] font-semibold tracking-[0.1em] uppercase">
           {PHASES.slice(0, 4).map((p) => (
             <span key={p.id} className={p.id === phase.id ? 'font-semibold' : 'text-faint'} style={p.id === phase.id ? { color: 'var(--phase-ink)' } : undefined}>
               {p.name}

@@ -59,7 +59,7 @@ export function StartScreen({ saved, best, corrupted, onStart, onContinue, onSet
                 <svg className="absolute -bottom-2 left-0 w-full" viewBox="0 0 400 22" preserveAspectRatio="none" aria-hidden><path d="M4 14 C 100 2, 200 26, 396 8" stroke={GOLD} strokeWidth="9" fill="none" strokeLinecap="round" /></svg>
               </span>
             </h1>
-            <p className="mt-9 text-lg sm:text-xl text-muted max-w-md">One decision at a time. How badly can this go?</p>
+            <p className="mt-9 text-xl sm:text-2xl text-ink/80 max-w-md font-medium">One decision at a time. How badly can this go?</p>
 
             {corrupted && (
               <div className="mt-8 max-w-md card p-4 text-sm">

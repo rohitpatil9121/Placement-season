@@ -18,7 +18,7 @@ export function Recent({ log, day }: { log: LogEntry[]; day: number }) {
             {items.map((e) => (
               <motion.li
                 key={e.id}
-                className={`flex gap-3 py-2 border-b hairline last:border-b-0 text-[13px] leading-snug ${TONE[e.kind]} ${e.day < day ? 'opacity-50' : ''}`}
+                className={`flex gap-3 py-2 border-b hairline last:border-b-0 text-[14px] leading-snug ${TONE[e.kind]} ${e.day < day ? 'opacity-50' : ''}`}
                 initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}
               >
                 <span className="text-faint tnum shrink-0 w-10">{e.time}</span>

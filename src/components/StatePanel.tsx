@@ -31,7 +31,7 @@ function Row({ k, value, delta, peek }: { k: StatKey; value: number; delta?: num
   return (
     <li className="py-3">
       <div className="flex items-center justify-between gap-3">
-        <span className={`inline-flex items-center gap-2.5 text-[13px] font-medium ${low ? 'text-danger' : 'text-ink'}`}>
+        <span className={`inline-flex items-center gap-2.5 text-[15px] font-semibold ${low ? 'text-danger' : 'text-ink'}`}>
           <span className="pill-icon" style={{ background: `color-mix(in srgb, ${color} 18%, transparent)` }}><StatIcon k={k} value={value} delta={delta} size={15} /></span>
           {STAT_LABEL[k]}{low ? ' · low' : ''}
         </span>
@@ -45,7 +45,7 @@ function Row({ k, value, delta, peek }: { k: StatKey; value: number; delta?: num
               {fmtDelta(k, delta)}
             </motion.span>
           )}
-          <Num value={shown} decimals={isCgpa ? 1 : 0} className="serif text-[22px] leading-none" />
+          <Num value={shown} decimals={isCgpa ? 1 : 0} className="serif text-[28px] leading-none" />
         </span>
       </div>
       <div key={flash} className={`mt-2 h-[9px] rounded-full overflow-hidden relative ${flash && delta && delta < 0 ? 'barshake' : ''}`} style={{ background: `color-mix(in srgb, ${color} 14%, var(--color-line))` }} aria-hidden>
@@ -65,7 +65,7 @@ export function StatePanel({ state, deltas, peek }: { state: GameState; deltas: 
   return (
     <section aria-label="Your state" className="panel p-5">
       <p className="eyebrow eyebrow-dot">Your state</p>
-      <p className="serif text-[20px] leading-tight mt-1" aria-live="polite">{vibeFor(state)}</p>
+      <p className="serif text-[26px] leading-tight mt-1" aria-live="polite">{vibeFor(state)}</p>
       <ul className="mt-3">
         {CORE_KEYS.map((k) => (
           <Row key={k} k={k} value={state.stats[k]} delta={deltas[k]} peek={peek?.[k]} />
@@ -98,7 +98,7 @@ export function StateStrip({ state }: { state: GameState }) {
         const low = !isCgpa && v < 20
         return (
           <div key={k} className="text-center">
-            <p className={`serif text-[22px] leading-none tnum ${low ? 'text-danger' : ''}`} style={low ? undefined : { color: STAT_COLOR[k] }}>{isCgpa ? toCgpa(v).toFixed(1) : Math.round(v)}</p>
+            <p className={`serif text-[26px] leading-none tnum ${low ? 'text-danger' : ''}`} style={low ? undefined : { color: STAT_COLOR[k] }}>{isCgpa ? toCgpa(v).toFixed(1) : Math.round(v)}</p>
             <p className="text-[10px] tracking-[0.1em] uppercase text-muted mt-1 inline-flex items-center gap-1"><StatIcon k={k} value={v} size={11} />{STAT_LABEL[k]}</p>
           </div>
         )
