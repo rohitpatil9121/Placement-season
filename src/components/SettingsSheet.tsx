@@ -85,7 +85,7 @@ export function SettingsSheet({ open, onClose, settings, onChange, best, unlocke
                 </div>
               )}
             </div>
-            <p className="mt-6 text-[11px] text-faint">Progress saves to this browser after every change. Keyboard: 1–9 for actions, E to end the day. Energy is your daily budget.</p>
+            <p className="mt-6 text-[11px] text-faint">Progress saves to this browser after every change. Keyboard: 1–9 for actions, E to end the day. </p>
           </div>
         ) : (
           <ul className="mt-4">

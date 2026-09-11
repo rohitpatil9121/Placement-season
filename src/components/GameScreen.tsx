@@ -50,7 +50,7 @@ export function GameScreen(p: Props) {
   const [shaking, setShaking] = useState(false)
   const [peek, setPeek] = useState<Effects | null>(null)
   const blocked = !!state.activeEvent || !!state.interview
-  const allUsed = state.stats.energy < 10
+  const allUsed = Object.values(state.usedToday).reduce((a, b) => a + (b ?? 0), 0) >= 6
   const mood = moodFor(state.stats)
   const bump = state.metrics.eventsSeen + state.log.length
 

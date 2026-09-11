@@ -112,9 +112,7 @@ export function canAct(state: GameState, id: ActionId): { ok: boolean; reason?: 
   if (state.status !== 'playing') return { ok: false }
   if (state.activeEvent || state.interview) return { ok: false }
   const used = state.usedToday[id] ?? 0
-  if (action.maxPerDay !== undefined && used >= action.maxPerDay) return { ok: false, reason: 'Enough for today' }
-  const energyCost = -(action.effects.energy ?? 0)
-  if (energyCost > 0 && state.stats.energy < energyCost) return { ok: false, reason: 'Not enough energy' }
+  if (used >= (action.maxPerDay ?? 1)) return { ok: false, reason: 'Done for today' }
   return { ok: true }
 }
 
@@ -124,7 +122,7 @@ export function previewAction(state: GameState, id: ActionId): Effects {
   const s = state.stats
   const e: Effects = { ...action.effects }
   const sleepMod = s.sleep < 30 ? 0.65 : s.sleep < 50 ? 0.85 : s.sleep > 80 ? 1.1 : 1
-  const energyMod = s.energy <= 0 ? 0.4 : s.energy < 20 ? 0.7 : 1
+  const energyMod = 1
   const moodMod = s.wellbeing < 25 ? 0.8 : s.wellbeing > 85 ? 1.08 : 1
   const round = (v: number) => Math.round(v * 10) / 10
   switch (id) {
@@ -138,16 +136,16 @@ export function previewAction(state: GameState, id: ActionId): Effects {
       e.projects = round(5 * energyMod * skillTier(s.projects))
       break
     case 'mock':
-      e.interview = round(5 * sleepMod * moodMod * skillTier(s.interview))
+      e.interview = round(5 * sleepMod * energyMod * moodMod * skillTier(s.interview))
       break
     case 'resume':
-      e.resume = round(7 * skillTier(s.resume))
+      e.resume = round(7 * energyMod * skillTier(s.resume))
       break
     case 'network':
-      e.networking = round(5 * moodMod * skillTier(s.networking))
+      e.networking = round(5 * energyMod * moodMod * skillTier(s.networking))
       break
     case 'apply':
-      e.applications = round(3 * (0.6 + s.resume / 150))
+      e.applications = round(3 * energyMod * (0.6 + s.resume / 150))
       break
     case 'sleep':
       if (s.sleep > 85) e.sleep = 8

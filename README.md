@@ -33,7 +33,6 @@ Keyboard: `1`–`9` triggers the actions in order, `E` ends the day, `Enter` sta
 
 | Stat | Behaviour |
 |------|-----------|
-| Energy | Spent by work, restored overnight in proportion to Sleep. At zero, demanding actions lock. |
 | Sleep | Decays every night. Restored by sleeping, drained by coffee, parties and all-nighters. |
 | DSA | Improves slowly with practice. Gains shrink above 30/50/70/85. Fades a little on days you skip. |
 | CGPA | Shown as 5.0–10.0, stored 0–100. Moves slowly. Drifts down if academics are ignored for long. |

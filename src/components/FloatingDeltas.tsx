@@ -14,7 +14,7 @@ export function FloatingDeltas({ deltas, nonce }: { deltas: Effects; nonce: numb
   useEffect(() => {
     if (!nonce || reduced) return
     const items = (Object.entries(deltas) as [StatKey, number][])
-      .filter(([, v]) => v && Math.abs(v) >= 0.05)
+      .filter(([k, v]) => k !== 'energy' && v && Math.abs(v) >= 0.05)
       .slice(0, 6)
       .map(([k, v], i) => ({ id: `${nonce}-${k}-${i}`, k, v }))
     if (!items.length) return

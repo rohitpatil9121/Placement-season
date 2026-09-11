@@ -24,7 +24,7 @@ export const fmtDelta = (k: StatKey, v: number) => {
 
 /** Inline consequence chips: "+6 DSA  −12 Energy" */
 export function EffectList({ effects, size = 'sm', className = '' }: { effects: Effects; size?: 'sm' | 'md'; className?: string }) {
-  const entries = (Object.entries(effects) as [StatKey, number][]).filter(([, v]) => v && Math.abs(v) >= 0.05)
+  const entries = (Object.entries(effects) as [StatKey, number][]).filter(([k, v]) => k !== 'energy' && v && Math.abs(v) >= 0.05)
   if (!entries.length) return null
   return (
     <span className={`inline-flex flex-wrap gap-x-3 gap-y-1 tnum ${size === 'sm' ? 'text-[13px]' : 'text-[15px]'} ${className}`}>

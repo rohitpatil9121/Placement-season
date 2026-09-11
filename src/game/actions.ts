@@ -7,7 +7,7 @@ export const ACTIONS: Action[] = [
     description: 'Problem-solving. Slowly, then suddenly.',
     icon: 'code',
     cost: 1,
-    effects: { dsa: 6, energy: -18, wellbeing: -5 },
+    effects: { dsa: 6, wellbeing: -5 },
     lines: [
       'Six problems. Still alive.',
       "Good. That's one problem off the list.",
@@ -22,7 +22,7 @@ export const ACTIONS: Action[] = [
     description: 'Semester subjects. The ones "that will come in placements."',
     icon: 'book-open',
     cost: 1,
-    effects: { cgpa: 1.7, energy: -15, wellbeing: -4 },
+    effects: { cgpa: 1.7, wellbeing: -4 },
     lines: [
       'Forty slides. Six understood. Standard ratio.',
       'Your notes are now better than the textbook. Marginally.',
@@ -36,7 +36,7 @@ export const ACTIONS: Action[] = [
     description: 'Something for the resume that actually runs.',
     icon: 'hammer',
     cost: 1,
-    effects: { projects: 5, energy: -18, wellbeing: -3 },
+    effects: { projects: 5, wellbeing: -3 },
     reveals: ['projects'],
     lines: [
       'Fixed a bug by deleting the feature. Shipped.',
@@ -52,7 +52,7 @@ export const ACTIONS: Action[] = [
     icon: 'moon',
     cost: 1,
     maxPerDay: 1,
-    effects: { sleep: 20, energy: 8, wellbeing: 6 },
+    effects: { sleep: 20, wellbeing: 6 },
     lines: ['Finally.', 'Eight hours. A personal record this semester.', 'Woke up unsure what day it was. Good sign.'],
   },
   {
@@ -61,7 +61,7 @@ export const ACTIONS: Action[] = [
     description: 'Tell me about yourself. Again.',
     icon: 'mic',
     cost: 1,
-    effects: { interview: 5, energy: -15, wellbeing: -6 },
+    effects: { interview: 5, wellbeing: -6 },
     reveals: ['interview'],
     lines: [
       'Said "great question" four times. Answered one.',
@@ -75,8 +75,7 @@ export const ACTIONS: Action[] = [
     description: 'Turn "made a website" into something a recruiter reads.',
     icon: 'file-text',
     cost: 1,
-    maxPerDay: 2,
-    effects: { resume: 7, energy: -8 },
+    effects: { resume: 7 },
     reveals: ['resume'],
     lines: [
       'Removed the tenth-standard percentage. Growth.',
@@ -90,8 +89,7 @@ export const ACTIONS: Action[] = [
     description: 'Message seniors. Hope they remember your face.',
     icon: 'users',
     cost: 1,
-    maxPerDay: 2,
-    effects: { networking: 5, luck: 2, energy: -8 },
+    effects: { networking: 5, luck: 2 },
     reveals: ['networking'],
     lines: [
       'Nine seniors messaged. One replied "ok".',
@@ -106,7 +104,7 @@ export const ACTIONS: Action[] = [
     icon: 'coffee',
     cost: 1,
     maxPerDay: 1,
-    effects: { wellbeing: 12, energy: 3, sleep: 4 },
+    effects: { wellbeing: 12, sleep: 4 },
     lines: [
       'Discussed placements for three hours. Prepared: zero.',
       'Nobody mentioned DSA for a full evening. Healing.',
@@ -120,7 +118,7 @@ export const ACTIONS: Action[] = [
     icon: 'graduation-cap',
     cost: 1,
     maxPerDay: 1,
-    effects: { cgpa: 0.6, energy: -8, motivation: 1 },
+    effects: { cgpa: 0.6, motivation: 1 },
     lines: [
       'The professor looked surprised to see you.',
       'Marked attendance for three friends. Leadership.',
@@ -133,8 +131,7 @@ export const ACTIONS: Action[] = [
     description: 'Portals, forms, the same details twelve times.',
     icon: 'send',
     cost: 1,
-    maxPerDay: 2,
-    effects: { applications: 3, energy: -9 },
+    effects: { applications: 3 },
     reveals: ['applications'],
     lines: [
       'Twelve forms. One upload each. Zero replies, for now.',
@@ -145,11 +142,11 @@ export const ACTIONS: Action[] = [
   {
     id: 'coffee',
     name: 'Coffee',
-    description: 'Borrow energy from tonight.',
+    description: 'A small mood lift. Tonight pays for it.',
     icon: 'cup-soda',
     cost: 0,
     maxPerDay: 2,
-    effects: { energy: 8, sleep: -8 },
+    effects: { wellbeing: 4, sleep: -8 },
     lines: ['Personality restored.', 'Second cup. Hands slightly unreliable now.'],
   },
   {
@@ -159,7 +156,7 @@ export const ACTIONS: Action[] = [
     icon: 'sofa',
     cost: 1,
     maxPerDay: 1,
-    effects: { energy: 30, sleep: 15, wellbeing: 18, dsa: -1, motivation: -3 },
+    effects: { sleep: 15, wellbeing: 18, dsa: -1, motivation: -3 },
     lines: ['One more episode did, in fact, hurt.', 'Did nothing. It was everything.', 'Two hundred unread messages. Not today.'],
   },
 ]

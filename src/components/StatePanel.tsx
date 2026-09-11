@@ -11,7 +11,7 @@ import { MOOD_LINE, moodFor } from './Mascot'
 export function vibeFor(state: GameState): string {
   const s = state.stats
   if (s.dsa > 85 && s.cgpa > 70) return 'Annoyingly competent.'
-  if (s.energy < 15 && s.sleep < 30) return 'Running on chai and hope.'
+  if (s.sleep < 30) return 'Running on chai and hope.'
   if (s.sleep > 85 && s.wellbeing > 80) return 'Suspiciously well-rested.'
   if (s.wellbeing < 25) return 'One LinkedIn post from crying.'
   if (state.metrics.offers > 0) return 'Screenshot. Send to family.'

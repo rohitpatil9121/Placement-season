@@ -43,12 +43,12 @@ export function ActionList({ state, onAct, hint, deltas, nonce, onPeek }: Props)
       <div className="flex items-baseline justify-between">
         <div>
           <p className="eyebrow eyebrow-dot">Today's list</p>
-          <p className="serif text-3xl sm:text-4xl mt-1">{ticked === 0 ? 'What are you doing today?' : state.stats.energy < 10 ? 'Out of energy. End the day.' : `${ticked} ticked. Keep going or end the day.`}</p>
+          <p className="serif text-3xl sm:text-4xl mt-1">{ticked === 0 ? 'What are you doing today?' : ticked >= ACTIONS.length ? 'Everything ticked. End the day.' : `${ticked} ticked. Keep going or end the day.`}</p>
         </div>
       </div>
       {hint && (
         <p className="mt-3 text-[13px] text-muted">
-          <span className="mark px-1 text-ink font-medium">Do as much as your energy allows.</span> Each thing costs energy and changes your state. End the day whenever you like.
+          <span className="mark px-1 text-ink font-medium">Tick anything, once a day.</span> Each one changes your state. End the day whenever you like.
         </p>
       )}
 
@@ -92,8 +92,8 @@ export function ActionList({ state, onAct, hint, deltas, nonce, onPeek }: Props)
                   <span className="flex items-center gap-2 flex-wrap">
                     <span className={`font-bold text-[16px] sm:text-[17px] ${done ? 'line-through decoration-2' : ''}`} style={done ? { textDecorationColor: color } : undefined}>{a.name}</span>
                     {done && <span className="text-[11px] font-bold tnum rounded-full px-1.5 py-0.5 text-white" style={{ background: color }}>done{used > 1 ? ` ×${used}` : ''}</span>}
+                    {a.maxPerDay && a.maxPerDay > 1 && !done && <span className="text-[11px] text-faint tnum">up to {a.maxPerDay}</span>}
                     {i < 9 && <kbd className="hidden lg:inline text-[10px] text-faint border hairline rounded px-1 leading-4">{i + 1}</kbd>}
-                    {a.maxPerDay && <span className="text-[11px] text-faint tnum">{used}/{a.maxPerDay}</span>}
                     {STREAK_OF[a.id] && state.streaks[STREAK_OF[a.id]!] >= 2 && (
                       <span className="inline-flex items-center gap-1 text-[11px] font-semibold rounded-full px-1.5 py-0.5 tnum" style={{ background: 'rgba(255,176,32,0.18)', color: '#9A5B00' }}>
                         <Flame size={11} strokeWidth={2.2} fill={state.streaks[STREAK_OF[a.id]!] >= STREAK_BONUS_AT ? '#FFB020' : 'none'} /> {state.streaks[STREAK_OF[a.id]!]}-day streak
@@ -107,7 +107,7 @@ export function ActionList({ state, onAct, hint, deltas, nonce, onPeek }: Props)
                 </span>
                 
                 <span className="opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity shrink-0" style={{ color }} aria-hidden>
-                  {done ? <span className="text-[11px] font-semibold">again</span> : <ArrowRight size={16} strokeWidth={2} />}
+                  {done && check.ok ? <span className="text-[11px] font-semibold">again</span> : !done ? <ArrowRight size={16} strokeWidth={2} /> : null}
                 </span>
               </motion.button>
               <div className="sm:hidden px-3.5 pt-1.5">

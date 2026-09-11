@@ -5,9 +5,9 @@ import type { Stats } from '../types/game'
 export type Mood = 'fresh' | 'tired' | 'dead' | 'hyped' | 'celebrate' | 'worried'
 
 export function moodFor(s: Stats): Mood {
-  if (s.wellbeing < 20 || s.energy <= 5) return 'dead'
-  if (s.energy < 30 || s.sleep < 25) return 'tired'
-  if (s.wellbeing > 85 && s.energy > 60) return 'hyped'
+  if (s.wellbeing < 20) return 'dead'
+  if (s.sleep < 25) return 'tired'
+  if (s.wellbeing > 85 && s.sleep > 60) return 'hyped'
   if (s.wellbeing < 40) return 'worried'
   return 'fresh'
 }

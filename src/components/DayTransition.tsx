@@ -20,7 +20,7 @@ export function DayTransition({ state, onStart }: { state: GameState; onStart: (
   const [ready, setReady] = useState(false)
   const next = state.day + 1
   const phase = getPhase(next)
-  const changed = (Object.entries(s.deltas) as [StatKey, number][]).filter(([, v]) => Math.abs(v) >= 0.5).sort((a, b) => Math.abs(b[1]) - Math.abs(a[1])).slice(0, 6)
+  const changed = (Object.entries(s.deltas) as [StatKey, number][]).filter(([k, v]) => k !== 'energy' && Math.abs(v) >= 0.5).sort((a, b) => Math.abs(b[1]) - Math.abs(a[1])).slice(0, 6)
   const line = LINES[next % LINES.length]
   const goodness = (Object.entries(s.deltas) as [StatKey, number][]).reduce((a, [k, v]) => a + (k === 'cgpa' ? v * 2 : v) * (k === 'energy' || k === 'sleep' ? 0.4 : 1), 0)
   const burst = goodness > 18 ? 1 : goodness > 6 ? 0.35 : 0
