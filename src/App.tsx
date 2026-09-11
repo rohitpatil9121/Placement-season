@@ -65,7 +65,7 @@ export default function App() {
       )}
 
       {view === 'result' && state && state.result && (
-        <PlacementDay state={state} reduced={settings.reducedMotion} onPlayAgain={g.startNew} onHome={g.home} onNotify={g.notify} />
+        <PlacementDay state={state} reduced={settings.reducedMotion} onPlayAgain={g.startNew} onHome={g.home} onNotify={g.notify} onBeat={(i) => play(i >= 4 ? 'chime' : 'pop')} />
       )}
 
       <Notices items={g.notices} onDismiss={g.dismiss} />
