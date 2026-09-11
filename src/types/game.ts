@@ -162,6 +162,7 @@ export type Settings = {
   reducedMotion: boolean
   seenFirstDayHint: boolean
   dark: boolean
+  music: boolean
 }
 
 export type Outcome = {

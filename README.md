@@ -94,7 +94,7 @@ npm run preview
 - **Juice.** Coloured pills pop out of every action, bars spring and flash, negative changes give a two-pixel shake, action dots are gold coins that flip when spent, streaks earn a flame chip and a tiny bonus, good days end in confetti sized to how good they were, legendary events flash and sparkle, offers rain gold, achievements arrive as a shimmering medal and pulse the trophy button until opened.
 - **Interactive surfaces.** Hovering an action ghost-fills the state bars with its exact effect. The timeline is a journey path with milestone icons and the mascot's head as the marker. Companies are trading cards with initials marks and tier colour bands that flip on stage change.
 - **Placement Day.** Each revealed number lands with a coloured burst and a rising tone, the verdict fills the screen in the outcome colour with the mascot, and the 9:16 poster card carries stat bars in stat colours.
-- **Sound, off by default.** Coin ticks for actions, a three-note sting for offers, a low thud for rejections, a short arpeggio for phase changes, a proper motif for placement. Mute lives in the header.
+- **Sound and music, on by default.** Coin ticks for actions, a three-note sting for offers, a low thud for rejections, a short arpeggio for phase changes, a proper motif for placement, and a synthesized lo-fi loop (pads, bass, plucks, soft hats) whose key, tempo and brightness change with the season. Everything is WebAudio, no files. Both start on the first click, and the header mute silences both.
 
 Everything above respects reduced motion: no particles, no shakes, no flashes, and instant sheet transitions.
 

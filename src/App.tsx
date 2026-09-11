@@ -10,9 +10,11 @@ import { SettingsSheet } from './components/SettingsSheet'
 import { StartScreen } from './components/StartScreen'
 import { useGame } from './hooks/useGame'
 import { useSound } from './hooks/useSound'
+import { useMusic } from './hooks/useMusic'
+import { getPhase } from './game/balance'
 
 export default function App() {
-  const [soundOn, setSoundOn] = useState(false)
+  const [soundOn, setSoundOn] = useState(true)
   const play = useSound(soundOn)
   const g = useGame(play)
   const { state, settings, view } = g
@@ -22,6 +24,7 @@ export default function App() {
   const openSettings = () => { setSettingsTab('settings'); setSettingsOpen(true) }
 
   useEffect(() => setSoundOn(settings.sound), [settings.sound])
+  useMusic(settings.music, state && view === 'game' ? getPhase(state.day).id : view === 'result' ? 'day90' : 'prep')
 
   // first-day hint is shown once, then remembered
   useEffect(() => {
@@ -49,8 +52,8 @@ export default function App() {
             hint={state.day === 1 && !settings.seenFirstDayHint}
             nonce={g.nonce}
             unseen={g.unseenAchievements}
-            sound={settings.sound}
-            onToggleSound={() => g.setSettings({ sound: !settings.sound })}
+            sound={settings.sound || settings.music}
+            onToggleSound={() => { const on = !(settings.sound || settings.music); g.setSettings({ sound: on, music: on }) }}
             onTrophies={openTrophies}
             onAct={g.act}
             onEndDay={g.finishDay}

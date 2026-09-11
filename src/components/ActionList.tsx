@@ -76,7 +76,7 @@ export function ActionList({ state, onAct, hint, deltas, nonce, onPeek }: Props)
                 <span className="badge" style={{ background: ACTION_COLOR[a.id], width: 48, height: 48, borderRadius: 14 }} aria-hidden>
                   <Icon name={a.icon} size={22} />
                 </span>
-                <span className="flex-1 min-w-0">
+                <span className="flex-1 min-w-0 flex flex-col self-stretch">
                   <span className="flex items-center gap-2">
                     <span className="font-bold text-[17px] sm:text-[18px]">{a.name}</span>
                     {i < 9 && <kbd className="hidden lg:inline text-[10px] text-faint border hairline rounded px-1 leading-4">{i + 1}</kbd>}
@@ -88,8 +88,8 @@ export function ActionList({ state, onAct, hint, deltas, nonce, onPeek }: Props)
                       </span>
                     )}
                   </span>
-                  <span className="block text-[14px] text-muted mt-1 leading-snug">{a.description}</span>
-                  <span className="block mt-1.5">
+                  <span className="block text-[14px] text-muted mt-1 leading-snug min-h-[2.6em] line-clamp-2">{a.description}</span>
+                  <span className="block mt-auto pt-2">
                     {check.ok || !check.reason ? <EffectList effects={preview} /> : <span className="text-[12px] text-warn font-medium">{check.reason}</span>}
                   </span>
                 </span>
