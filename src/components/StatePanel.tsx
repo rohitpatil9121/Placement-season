@@ -67,7 +67,7 @@ export function StatePanel({ state, deltas, peek }: { state: GameState; deltas: 
       <p className="eyebrow eyebrow-dot">Your state</p>
       <p className="serif text-[26px] leading-tight mt-1" aria-live="polite">{vibeFor(state)}</p>
       <ul className="mt-3">
-        {CORE_KEYS.map((k) => (
+        {CORE_KEYS.filter((k) => k !== 'energy').map((k) => (
           <Row key={k} k={k} value={state.stats[k]} delta={deltas[k]} peek={peek?.[k]} />
         ))}
       </ul>
@@ -91,8 +91,8 @@ export function StatePanel({ state, deltas, peek }: { state: GameState; deltas: 
 /** Compact five-stat strip for narrow screens; the full panel sits below the actions. */
 export function StateStrip({ state }: { state: GameState }) {
   return (
-    <div className="grid grid-cols-5 border-y hairline py-3" aria-label="Your state, summary">
-      {CORE_KEYS.map((k) => {
+    <div className="grid grid-cols-4 border-y hairline py-3" aria-label="Your state, summary">
+      {CORE_KEYS.filter((k) => k !== 'energy').map((k) => {
         const isCgpa = k === 'cgpa'
         const v = state.stats[k]
         const low = !isCgpa && v < 20

@@ -104,7 +104,7 @@ export function ActionList({ state, onAct, hint, deltas, nonce, onPeek }: Props)
                   <span className="block text-[13px] text-muted mt-0.5 leading-snug truncate">{a.description}</span>
                 </span>
                 <span className="hidden sm:block text-right shrink-0">
-                  {check.ok || !check.reason ? <EffectList effects={preview} /> : <span className="text-[12px] text-warn font-medium">{check.reason}</span>}
+                  {check.ok || !check.reason ? <EffectList effects={preview} /> : check.reason === 'No actions left' ? null : <span className="text-[12px] text-warn font-medium">{check.reason}</span>}
                 </span>
                 
                 <span className="opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity shrink-0" style={{ color }} aria-hidden>
@@ -112,7 +112,7 @@ export function ActionList({ state, onAct, hint, deltas, nonce, onPeek }: Props)
                 </span>
               </motion.button>
               <div className="sm:hidden px-3.5 pt-1.5">
-                {check.ok || !check.reason ? <EffectList effects={preview} /> : <span className="text-[12px] text-warn font-medium">{check.reason}</span>}
+                {check.ok || !check.reason ? <EffectList effects={preview} /> : check.reason === 'No actions left' ? null : <span className="text-[12px] text-warn font-medium">{check.reason}</span>}
               </div>
             </li>
           )
