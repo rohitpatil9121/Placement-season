@@ -156,6 +156,7 @@ export type Settings = {
   sound: boolean
   reducedMotion: boolean
   seenFirstDayHint: boolean
+  dark: boolean
 }
 
 export type Outcome = {

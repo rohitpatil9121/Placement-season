@@ -6,6 +6,8 @@ import {
 } from '../game/engine'
 import { ACHIEVEMENT_MAP } from '../game/achievements'
 import { toCgpa } from '../game/scoring'
+import { getPhase } from '../game/balance'
+import { PHASE_THEME } from '../components/theme'
 import {
   clearEverything, clearSave, loadBest, loadGame, loadGlobalAchievements, loadSettings, saveBest, saveGame,
   saveGlobalAchievements, saveSettings,
@@ -43,7 +45,18 @@ export function useGame(play: (k: SoundKind) => void) {
 
   useEffect(() => {
     document.documentElement.setAttribute('data-reduced-motion', settings.reducedMotion ? 'true' : 'false')
-  }, [settings.reducedMotion])
+    document.documentElement.setAttribute('data-theme', settings.dark ? 'dark' : 'light')
+  }, [settings.reducedMotion, settings.dark])
+
+  // phase tint follows the day; the start screen and results use their own
+  useEffect(() => {
+    const root = document.documentElement.style
+    const phase = state && view === 'game' ? getPhase(state.day).id : view === 'result' ? 'day90' : 'prep'
+    const th = PHASE_THEME[phase]
+    root.setProperty('--phase-tint', settings.dark ? th.tintDark : th.tint)
+    root.setProperty('--phase-accent', th.accent)
+    root.setProperty('--phase-ink', th.ink)
+  }, [state, view, settings.dark])
 
   useEffect(() => {
     if (!state) return

@@ -6,7 +6,7 @@ const SETTINGS_KEY = 'placement-season:settings'
 const BEST_KEY = 'placement-season:best'
 const ACH_KEY = 'placement-season:achievements'
 
-export const DEFAULT_SETTINGS: Settings = { sound: false, reducedMotion: false, seenFirstDayHint: false }
+export const DEFAULT_SETTINGS: Settings = { sound: false, reducedMotion: false, seenFirstDayHint: false, dark: false }
 export const EMPTY_BEST: BestRuns = { bestScore: 0, bestSalary: 0, bestDsa: 0, bestCgpa: 0, mostChaotic: 0, runs: 0 }
 
 const get = (k: string) => {
@@ -81,6 +81,7 @@ export function loadSettings(): Settings {
       sound: typeof p.sound === 'boolean' ? p.sound : DEFAULT_SETTINGS.sound,
       reducedMotion: typeof p.reducedMotion === 'boolean' ? p.reducedMotion : DEFAULT_SETTINGS.reducedMotion,
       seenFirstDayHint: typeof p.seenFirstDayHint === 'boolean' ? p.seenFirstDayHint : false,
+      dark: typeof p.dark === 'boolean' ? p.dark : false,
     }
   } catch {
     return DEFAULT_SETTINGS

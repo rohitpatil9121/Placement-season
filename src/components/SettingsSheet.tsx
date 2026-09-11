@@ -44,7 +44,8 @@ export function SettingsSheet({ open, onClose, settings, onChange, best, unlocke
         {tab === 'settings' ? (
           <div className="mt-4">
             <Toggle label="Sound" hint="Small clicks and chimes. Off by default." on={settings.sound} onChange={(v) => onChange({ sound: v })} />
-            <Toggle label="Reduced motion" hint="Skips transitions and reveals." on={settings.reducedMotion} onChange={(v) => onChange({ reducedMotion: v })} />
+            <Toggle label="Dark mode" hint="Same colours on deep navy." on={settings.dark} onChange={(v) => onChange({ dark: v })} />
+            <Toggle label="Reduced motion" hint="Skips transitions, particles and shakes." on={settings.reducedMotion} onChange={(v) => onChange({ reducedMotion: v })} />
 
             {best.runs > 0 && (
               <>
