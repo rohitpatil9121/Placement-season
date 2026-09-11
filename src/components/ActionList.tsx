@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { ArrowRight, Flame } from 'lucide-react'
+import { ArrowRight, Check, Flame } from 'lucide-react'
 import type { ActionId, GameState } from '../types/game'
 import { ACTIONS } from '../game/actions'
 import { ACTIONS_PER_DAY } from '../game/balance'
@@ -42,27 +42,29 @@ export function ActionList({ state, onAct, hint, deltas, nonce, onPeek }: Props)
       <FloatingDeltas deltas={deltas} nonce={nonce} />
       <div className="flex items-baseline justify-between">
         <div>
-          <p className="eyebrow eyebrow-dot">Today</p>
-          <p className="serif text-3xl sm:text-4xl mt-1">{remaining === 0 ? 'Nothing left to do.' : remaining === ACTIONS_PER_DAY ? 'Pick your battles.' : 'Keep going.'}</p>
+          <p className="eyebrow eyebrow-dot">Today's list</p>
+          <p className="serif text-3xl sm:text-4xl mt-1">{remaining === 0 ? 'All ticked. End the day.' : remaining === ACTIONS_PER_DAY ? 'Pick three things.' : `${ACTIONS_PER_DAY - remaining} of ${ACTIONS_PER_DAY} ticked.`}</p>
         </div>
         <div className="text-right">
           <ActionDots remaining={remaining} />
-          <p className="text-[13px] text-muted mt-1.5 tnum font-medium">{remaining} action{remaining === 1 ? '' : 's'} remaining</p>
+          <p className="text-[13px] text-muted mt-1.5 tnum font-medium">{remaining} left to tick</p>
         </div>
       </div>
       {hint && (
         <p className="mt-3 text-[13px] text-muted">
-          <span className="mark px-1 text-ink font-medium">You have three actions.</span> Each one changes your state. Then the day ends.
+          <span className="mark px-1 text-ink font-medium">Tick three things today.</span> Each one changes your state. Then end the day.
         </p>
       )}
 
-      <ul className="mt-5 grid sm:grid-cols-2 gap-3">
+      <ul className="mt-5 flex flex-col gap-2" role="list" aria-label="Today's to-do list">
         {ACTIONS.map((a, i) => {
           const check = canAct(state, a.id)
           const preview = previewAction(state, a.id)
           const used = state.usedToday[a.id] ?? 0
+          const done = used > 0
+          const color = ACTION_COLOR[a.id]
           return (
-            <li key={a.id} style={{ ['--tile' as string]: ACTION_COLOR[a.id] }}>
+            <li key={a.id} style={{ ['--tile' as string]: color }}>
               <motion.button
                 onClick={() => onAct(a.id)}
                 onMouseEnter={() => check.ok && onPeek?.(preview)}
@@ -71,14 +73,29 @@ export function ActionList({ state, onAct, hint, deltas, nonce, onPeek }: Props)
                 onBlur={() => onPeek?.(null)}
                 disabled={!check.ok}
                 aria-disabled={!check.ok}
-                className="tile group w-full h-full text-left p-4 flex items-start gap-4 disabled:opacity-45"
+                aria-label={`${a.name}${done ? `, done ${used} time${used === 1 ? '' : 's'} today` : ''}`}
+                className={`tile group w-full text-left px-3.5 py-3 flex items-center gap-3.5 disabled:opacity-45 ${done ? 'is-done' : ''}`}
+                style={done ? { background: `color-mix(in srgb, ${color} 16%, var(--color-surface))`, borderColor: color } : undefined}
+                layout
               >
-                <span className="badge" style={{ background: ACTION_COLOR[a.id], width: 48, height: 48, borderRadius: 14 }} aria-hidden>
-                  <Icon name={a.icon} size={22} />
+                {/* checkbox */}
+                <motion.span
+                  className="w-7 h-7 rounded-full border-2 flex items-center justify-center shrink-0"
+                  style={{ borderColor: color, background: done ? color : 'transparent', color: '#fff' }}
+                  initial={false}
+                  animate={{ scale: done ? [1, 1.25, 1] : 1 }}
+                  transition={{ duration: 0.35 }}
+                  aria-hidden
+                >
+                  {done ? <Check size={16} strokeWidth={3} /> : <span className="w-2 h-2 rounded-full opacity-0 group-hover:opacity-60 transition-opacity" style={{ background: color }} />}
+                </motion.span>
+                <span className="badge" style={{ background: color, width: 36, height: 36, borderRadius: 11 }} aria-hidden>
+                  <Icon name={a.icon} size={17} />
                 </span>
-                <span className="flex-1 min-w-0 flex flex-col self-stretch">
-                  <span className="flex items-center gap-2">
-                    <span className="font-bold text-[17px] sm:text-[18px]">{a.name}</span>
+                <span className="flex-1 min-w-0">
+                  <span className="flex items-center gap-2 flex-wrap">
+                    <span className={`font-bold text-[16px] sm:text-[17px] ${done ? 'line-through decoration-2' : ''}`} style={done ? { textDecorationColor: color } : undefined}>{a.name}</span>
+                    {done && <span className="text-[11px] font-bold tnum rounded-full px-1.5 py-0.5 text-white" style={{ background: color }}>done{used > 1 ? ` ×${used}` : ''}</span>}
                     {i < 9 && <kbd className="hidden lg:inline text-[10px] text-faint border hairline rounded px-1 leading-4">{i + 1}</kbd>}
                     {a.maxPerDay && <span className="text-[11px] text-faint tnum">{used}/{a.maxPerDay}</span>}
                     {a.cost !== 1 && <span className="text-[11px] text-faint">{a.cost === 0 ? 'free' : `${a.cost} actions`}</span>}
@@ -88,15 +105,19 @@ export function ActionList({ state, onAct, hint, deltas, nonce, onPeek }: Props)
                       </span>
                     )}
                   </span>
-                  <span className="block text-[14px] text-muted mt-1 leading-snug min-h-[2.6em] line-clamp-2">{a.description}</span>
-                  <span className="block mt-auto pt-2">
-                    {check.ok || !check.reason ? <EffectList effects={preview} /> : <span className="text-[12px] text-warn font-medium">{check.reason}</span>}
-                  </span>
+                  <span className="block text-[13px] text-muted mt-0.5 leading-snug truncate">{a.description}</span>
                 </span>
-                <span className="mt-1 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity" style={{ color: ACTION_COLOR[a.id] }} aria-hidden>
-                  <ArrowRight size={16} strokeWidth={2} />
+                <span className="hidden sm:block text-right shrink-0">
+                  {check.ok || !check.reason ? <EffectList effects={preview} /> : <span className="text-[12px] text-warn font-medium">{check.reason}</span>}
+                </span>
+                
+                <span className="opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity shrink-0" style={{ color }} aria-hidden>
+                  {done ? <span className="text-[11px] font-semibold">again</span> : <ArrowRight size={16} strokeWidth={2} />}
                 </span>
               </motion.button>
+              <div className="sm:hidden px-3.5 pt-1.5">
+                {check.ok || !check.reason ? <EffectList effects={preview} /> : <span className="text-[12px] text-warn font-medium">{check.reason}</span>}
+              </div>
             </li>
           )
         })}
